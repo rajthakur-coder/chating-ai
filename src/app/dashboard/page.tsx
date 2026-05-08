@@ -79,13 +79,27 @@ import type { Metadata } from "next";
 import Icon from "@/components/ui/Icon";
 import Image from "next/image";
 
+declare global {
+  interface Window {
+    fbAsyncInit: () => void;
+    FB: {
+      init: (options: Record<string, unknown>) => void;
+      login: (callback: (response: any) => void, options: Record<string, unknown>) => void;
+    };
+  }
+}
+
+const metaAppId = process.env.NEXT_PUBLIC_META_APP_ID || "";
+const metaConfigId = process.env.NEXT_PUBLIC_META_CONFIG_ID || "";
+const metaAuthUrl = process.env.NEXT_PUBLIC_META_AUTH_URL || "";
+
 export default function Home() {
 
   useEffect(() => {
 
     window.fbAsyncInit = function () {
       window.FB.init({
-        appId: "4092863384192066",
+        appId: metaAppId,
         cookie: true,
         xfbml: true,
         version: "v22.0",
@@ -116,7 +130,7 @@ export default function Home() {
 
           console.log("AUTH CODE:", code);
 
-           fetch("http://localhost:8000/auth/meta", {
+           fetch(metaAuthUrl, {
             method: "POST",
             headers: {
               "Content-Type": "application/json",
@@ -129,7 +143,7 @@ export default function Home() {
         }
       },
       {
-        config_id: "1625667441992055",
+        config_id: metaConfigId,
         response_type: "code",
         override_default_response_type: true,
         extras: {
