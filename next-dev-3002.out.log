@@ -1,0 +1,10 @@
+
+> whatappautomation@0.1.0 dev
+> next dev --port 3002
+
+▲ Next.js 16.2.6 (Turbopack)
+- Local:         http://localhost:3002
+- Network:       http://192.168.31.82:3002
+- Environments: .env
+✓ Ready in 833ms
+[?25h

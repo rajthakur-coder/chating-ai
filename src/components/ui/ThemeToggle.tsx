@@ -1,32 +1,15 @@
 "use client";
 
-import { useState } from "react";
 import Icon from "@/components/ui/Icon";
-
-const STORAGE_KEY = "theme";
-
-function getInitialTheme() {
-  if (typeof window === "undefined") return "light";
-  const saved = window.localStorage.getItem(STORAGE_KEY);
-  if (saved === "light" || saved === "dark") return saved;
-  return window.matchMedia("(prefers-color-scheme: dark)").matches
-    ? "dark"
-    : "light";
-}
+import { useThemeStore } from "@/store/useThemeStore";
+import { useEffect } from "react";
 
 export default function ThemeToggle() {
-  const [theme, setTheme] = useState<"light" | "dark">(() => {
-    if (typeof window === "undefined") return "light";
-    return getInitialTheme();
-  });
+  const { theme, initializeTheme, toggleTheme } = useThemeStore();
 
-  function toggleTheme() {
-    const next = theme === "dark" ? "light" : "dark";
-    document.documentElement.classList.remove("light", "dark");
-    document.documentElement.classList.add(next);
-    window.localStorage.setItem(STORAGE_KEY, next);
-    setTheme(next);
-  }
+  useEffect(() => {
+    initializeTheme();
+  }, [initializeTheme]);
 
   const iconName = theme === "dark" ? "ri:sun-line" : "ri:moon-line";
   const label = `Switch to ${theme === "dark" ? "light" : "dark"} mode`;

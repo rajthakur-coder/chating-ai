@@ -1,0 +1,85 @@
+[browser] Image with src "/rocket_icon.png" has either width or height modified, but not the other. If you use CSS to change the size of your image, also include the styles 'width: "auto"' or 'height: "auto"' to maintain the aspect ratio.
+[browser] Image with src "/rocket_icon.png" was detected as the Largest Contentful Paint (LCP). Please add the `loading="eager"` property if this image is above the fold.
+Read more: https://nextjs.org/docs/app/api-reference/components/image#loading
+[browser] Image with src "/rocket_icon.png" has either width or height modified, but not the other. If you use CSS to change the size of your image, also include the styles 'width: "auto"' or 'height: "auto"' to maintain the aspect ratio.
+[browser] Image with src "/rocket_icon.png" was detected as the Largest Contentful Paint (LCP). Please add the `loading="eager"` property if this image is above the fold.
+Read more: https://nextjs.org/docs/app/api-reference/components/image#loading
+[browser] Image with src "/rocket_icon.png" has either width or height modified, but not the other. If you use CSS to change the size of your image, also include the styles 'width: "auto"' or 'height: "auto"' to maintain the aspect ratio.
+[browser] Image with src "/rocket_icon.png" was detected as the Largest Contentful Paint (LCP). Please add the `loading="eager"` property if this image is above the fold.
+Read more: https://nextjs.org/docs/app/api-reference/components/image#loading
+[browser] The method FB.login can no longer be called from http pages. https://developers.facebook.com/blog/post/2018/06/08/enforce-https-facebook-login/ 
+    at Object.s [as log] (https://connect.facebook.net/en_US/bundle/sdk.js/:77:299)
+    at u (https://connect.facebook.net/en_US/bundle/sdk.js/:173:234)
+    at Object.login (https://connect.facebook.net/en_US/bundle/sdk.js/:190:779)
+    at Object.<anonymous> (https://connect.facebook.net/en_US/bundle/sdk.js/:106:920)
+    at Object.login (https://connect.facebook.net/en_US/bundle/sdk.js/:96:259)
+    at launchWhatsAppSignup (src\app\dashboard\page.tsx:122:15)
+  120 |   const launchWhatsAppSignup = () => {
+  121 |
+> 122 |     window.FB.login(
+      |               ^
+  123 |        function (response: any) {
+  124 |
+  125 |         console.log("META RESPONSE:", response); (https://connect.facebook.net/en_US/bundle/sdk.js/:77:299)
+[browser] The method FB.login can no longer be called from http pages. https://developers.facebook.com/blog/post/2018/06/08/enforce-https-facebook-login/ 
+    at Object.s [as log] (https://connect.facebook.net/en_US/bundle/sdk.js/:77:299)
+    at u (https://connect.facebook.net/en_US/bundle/sdk.js/:173:234)
+    at Object.login (https://connect.facebook.net/en_US/bundle/sdk.js/:190:779)
+    at Object.<anonymous> (https://connect.facebook.net/en_US/bundle/sdk.js/:106:920)
+    at Object.login (https://connect.facebook.net/en_US/bundle/sdk.js/:96:259)
+    at launchWhatsAppSignup (src\app\dashboard\page.tsx:122:15)
+  120 |   const launchWhatsAppSignup = () => {
+  121 |
+> 122 |     window.FB.login(
+      |               ^
+  123 |        function (response: any) {
+  124 |
+  125 |         console.log("META RESPONSE:", response); (https://connect.facebook.net/en_US/bundle/sdk.js/:77:299)
+[browser] The method FB.login can no longer be called from http pages. https://developers.facebook.com/blog/post/2018/06/08/enforce-https-facebook-login/ 
+    at Object.s [as log] (https://connect.facebook.net/en_US/bundle/sdk.js/:77:299)
+    at u (https://connect.facebook.net/en_US/bundle/sdk.js/:173:234)
+    at Object.login (https://connect.facebook.net/en_US/bundle/sdk.js/:190:779)
+    at Object.<anonymous> (https://connect.facebook.net/en_US/bundle/sdk.js/:106:920)
+    at Object.login (https://connect.facebook.net/en_US/bundle/sdk.js/:96:259)
+    at launchWhatsAppSignup (src\app\dashboard\page.tsx:122:15)
+  120 |   const launchWhatsAppSignup = () => {
+  121 |
+> 122 |     window.FB.login(
+      |               ^
+  123 |        function (response: any) {
+  124 |
+  125 |         console.log("META RESPONSE:", response); (https://connect.facebook.net/en_US/bundle/sdk.js/:77:299)
+[browser] The method FB.login can no longer be called from http pages. https://developers.facebook.com/blog/post/2018/06/08/enforce-https-facebook-login/ 
+    at Object.s [as log] (https://connect.facebook.net/en_US/bundle/sdk.js/:77:299)
+    at u (https://connect.facebook.net/en_US/bundle/sdk.js/:173:234)
+    at Object.login (https://connect.facebook.net/en_US/bundle/sdk.js/:190:779)
+    at Object.<anonymous> (https://connect.facebook.net/en_US/bundle/sdk.js/:106:920)
+    at Object.login (https://connect.facebook.net/en_US/bundle/sdk.js/:96:259)
+    at launchWhatsAppSignup (src\app\dashboard\page.tsx:122:15)
+  120 |   const launchWhatsAppSignup = () => {
+  121 |
+> 122 |     window.FB.login(
+      |               ^
+  123 |        function (response: any) {
+  124 |
+  125 |         console.log("META RESPONSE:", response); (https://connect.facebook.net/en_US/bundle/sdk.js/:77:299)
+[browser] The method FB.login can no longer be called from http pages. https://developers.facebook.com/blog/post/2018/06/08/enforce-https-facebook-login/ 
+    at Object.s [as log] (https://connect.facebook.net/en_US/bundle/sdk.js/:77:299)
+    at u (https://connect.facebook.net/en_US/bundle/sdk.js/:173:234)
+    at Object.login (https://connect.facebook.net/en_US/bundle/sdk.js/:190:779)
+    at Object.<anonymous> (https://connect.facebook.net/en_US/bundle/sdk.js/:106:920)
+    at Object.login (https://connect.facebook.net/en_US/bundle/sdk.js/:96:259)
+    at launchWhatsAppSignup (src\app\dashboard\page.tsx:122:15)
+  120 |   const launchWhatsAppSignup = () => {
+  121 |
+> 122 |     window.FB.login(
+      |               ^
+  123 |        function (response: any) {
+  124 |
+  125 |         console.log("META RESPONSE:", response); (https://connect.facebook.net/en_US/bundle/sdk.js/:77:299)
+[browser] Image with src "/rocket_icon.png" has either width or height modified, but not the other. If you use CSS to change the size of your image, also include the styles 'width: "auto"' or 'height: "auto"' to maintain the aspect ratio.
+[browser] Image with src "/rocket_icon.png" was detected as the Largest Contentful Paint (LCP). Please add the `loading="eager"` property if this image is above the fold.
+Read more: https://nextjs.org/docs/app/api-reference/components/image#loading
+[browser] Image with src "/rocket_icon.png" has either width or height modified, but not the other. If you use CSS to change the size of your image, also include the styles 'width: "auto"' or 'height: "auto"' to maintain the aspect ratio.
+[browser] Image with src "/rocket_icon.png" was detected as the Largest Contentful Paint (LCP). Please add the `loading="eager"` property if this image is above the fold.
+Read more: https://nextjs.org/docs/app/api-reference/components/image#loading

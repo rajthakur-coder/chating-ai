@@ -1,7 +1,13 @@
+"use client";
+
 import Icon from "@/components/ui/Icon";
 import ThemeToggle from "@/components/ui/ThemeToggle";
+import { useState } from "react";
+import TopbarProfile from "./TopbarProfile";
 
 export default function Navbar() {
+  const [profileOpen, setProfileOpen] = useState(false);
+
   return (
     <header className="sticky top-0 z-30 border-b border-default bg-surface/95 px-5 py-1.5 shadow-sm backdrop-blur-xl">
       <div className="flex items-center justify-between gap-4">
@@ -39,8 +45,12 @@ export default function Navbar() {
 
           <ThemeToggle />
 
-          <div className="hidden h-9 w-9 items-center justify-center rounded-full bg-foreground text-foreground text-sm font-semibold shadow-lg shadow-slate-950/20 sm:inline-flex">
-            R
+          <div className="hidden sm:inline-flex">
+            <TopbarProfile
+              isOpen={profileOpen}
+              onToggle={() => setProfileOpen((prev) => !prev)}
+              onClose={() => setProfileOpen(false)}
+            />
           </div>
         </div>
       </div>

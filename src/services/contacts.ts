@@ -1,0 +1,105 @@
+import api from "@/lib/api";
+
+export type ContactStatus = "Active" | "Inactive" | "Blocked" | "Banned" | "Archived";
+
+export type ContactTag = {
+  id: number | string;
+  name: string;
+  color?: string | null;
+};
+
+export type Contact = {
+  id: string;
+  sr_no?: number;
+  customer_phone_number: string;
+  profile_name?: string | null;
+  custom_name?: string | null;
+  contact_tags?: ContactTag[];
+  remark?: string | null;
+  status?: ContactStatus;
+  created_at?: string | null;
+  updated_at?: string | null;
+};
+
+export type ContactsResponse = {
+  success: boolean;
+  statusCode: number;
+  message: string;
+  recordsTotal: number;
+  recordsFiltered: number;
+  total_active?: number;
+  total_blocked?: number;
+  total_inactive?: number;
+  data: Contact[];
+};
+
+export type ApiMutationResponse<T = unknown> = {
+  success: boolean;
+  statusCode: number;
+  message: string;
+  data?: T;
+};
+
+export function getContacts(params?: {
+  offset?: number;
+  limit?: number;
+  searchValue?: string;
+  status?: ContactStatus;
+  tags?: string;
+  tag_ids?: string | number;
+}) {
+  return api
+    .get<ContactsResponse>("/whatsapp-message/contacts/get", { params })
+    .then((response) => response.data);
+}
+
+export function saveContact(payload: {
+  customer_phone_number: string;
+  custom_name: string;
+  remark?: string;
+}) {
+  return api
+    .post<ApiMutationResponse>("/whatsapp-message/contacts/add", payload)
+    .then((response) => response.data);
+}
+
+export function updateContactStatus(payload: {
+  customer_phone_number: string;
+  status: ContactStatus;
+}) {
+  return api
+    .patch<ApiMutationResponse>("/whatsapp-message/contacts/update-status", payload)
+    .then((response) => response.data);
+}
+
+export function deleteContact(contact: string) {
+  return api
+    .delete<ApiMutationResponse>("/whatsapp-message/contacts/delete", {
+      params: { contact },
+    })
+    .then((response) => response.data);
+}
+
+export function getTags(params?: { search?: string; offset?: number; limit?: number }) {
+  return api
+    .get<{ data: ContactTag[] }>("/whatsapp-message/tags/get-list", { params })
+    .then((response) => response.data.data);
+}
+
+export function createTag(payload: { name: string; color?: string }) {
+  return api
+    .post<ApiMutationResponse<ContactTag>>("/whatsapp-message/tags/create", payload)
+    .then((response) => response.data);
+}
+
+export function assignTags(payload: { contact_id: number; tag_ids: number[] }) {
+  return api
+    .post<ApiMutationResponse>("/whatsapp-message/tags/assign", payload)
+    .then((response) => response.data);
+}
+
+export function removeAssignedTag(payload: { contact_id: number; tag_id: number }) {
+  return api
+    .post<ApiMutationResponse>("/whatsapp-message/tags/remove", payload)
+    .then((response) => response.data);
+}
