@@ -6,6 +6,25 @@ export type CurrentUser = {
   name?: string;
 };
 
+export type SignInPayload = {
+  email: string;
+  password: string;
+};
+
+export type SignInResponse = {
+  id?: string;
+  email?: string;
+  name?: string;
+  verified?: boolean;
+  onboarding_completed?: boolean;
+  message?: string;
+};
+
+export async function signIn(payload: SignInPayload) {
+  const response = await api.post<SignInResponse>("/auth/sign-in", payload);
+  return response.data;
+}
+
 export async function getCurrentUser() {
   const response = await api.get<CurrentUser>("/auth/me");
   return response.data;

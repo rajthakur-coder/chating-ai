@@ -15,7 +15,7 @@ const authServiceUrl = process.env.NEXT_PUBLIC_AUTH_SERVICE_URL;
 
 export default function AuthGuard({ children }: AuthGuardProps) {
   const pathname = usePathname();
-  const isPublicPage = pathname === "/privacy";
+  const isPublicPage = pathname === "/privacy" || pathname === "/login";
   // const isPublicPage = pathname === "/privacy" || pathname === "/dashboard";
   // const isPublicPage = true;
 
@@ -33,21 +33,28 @@ export default function AuthGuard({ children }: AuthGuardProps) {
     if (isPublicPage) return;
 
     if (!apiUrl && authServiceUrl) {
-      const redirectUri = `${window.location.origin}/dashboard`;
-      const signInUrl = new URL("/sign-in", authServiceUrl);
-      signInUrl.searchParams.set("redirect_uri", redirectUri);
-      window.location.assign(signInUrl.toString());
+      window.location.assign("/login");
       return;
+
+      // Old external auth flow, keep this for easy rollback after testing:
+      // const redirectUri = `${window.location.origin}/dashboard`;
+      // const signInUrl = new URL("/sign-in", authServiceUrl);
+      // signInUrl.searchParams.set("redirect_uri", redirectUri);
+      // window.location.assign(signInUrl.toString());
+      // return;
     }
 
     if (currentUserQuery.isLoading || currentUserQuery.isSuccess) return;
     if (!authServiceUrl) return;
 
-    const redirectUri = `${window.location.origin}/dashboard`;
-    const signInUrl = new URL("/sign-in", authServiceUrl);
-    signInUrl.searchParams.set("redirect_uri", redirectUri);
+    window.location.assign(`/login?redirect=${encodeURIComponent(window.location.href)}`);
+    return;
 
-    window.location.assign(signInUrl.toString());
+    // Old external auth flow, keep this for easy rollback after testing:
+    // const redirectUri = `${window.location.origin}/dashboard`;
+    // const signInUrl = new URL("/sign-in", authServiceUrl);
+    // signInUrl.searchParams.set("redirect_uri", redirectUri);
+    // window.location.assign(signInUrl.toString());
   }, [
     pathname,
     isPublicPage,

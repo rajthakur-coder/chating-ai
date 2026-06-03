@@ -3,8 +3,7 @@ import Script from "next/script";
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 import AuthGuard from "@/components/auth/AuthGuard";
-import Navbar from "@/components/layout/Navbar";
-import Sidebar from "@/components/layout/sidebar/Sidebar";
+import AppFrame from "@/components/layout/AppFrame";
 import AppProviders from "@/components/providers/AppProviders";
 import AppToaster from "@/components/ui/AppToaster";
 
@@ -43,15 +42,7 @@ export default function RootLayout({
         </Script>
         <AppProviders>
           <AuthGuard>
-            <div className="flex min-h-screen">
-              <Sidebar />
-              <div className="flex min-w-0 flex-1 flex-col">
-                <Navbar />
-                <main className="flex-1 px-4 py-4 md:px-4">
-                  {children}
-                </main>
-              </div>
-            </div>
+            <AppFrame>{children}</AppFrame>
           </AuthGuard>
           <AppToaster />
         </AppProviders>

@@ -25,9 +25,11 @@ api.interceptors.response.use(
     if (error.response && error.response.status === 401) {
       console.warn("Unauthorized request - Redirecting to Login");
       if (typeof window !== "undefined") {
-        const authUrl = process.env.NEXT_PUBLIC_AUTH_SERVICE_URL || "http://localhost:3001";
         const redirectUrl = encodeURIComponent(window.location.href);
-        window.location.href = `${authUrl}/login?redirect=${redirectUrl}`;
+        window.location.href = `/login?redirect=${redirectUrl}`;
+        // Old external auth flow, keep this for easy rollback after testing:
+        // const authUrl = process.env.NEXT_PUBLIC_AUTH_SERVICE_URL || "http://localhost:3001";
+        // window.location.href = `${authUrl}/login?redirect=${redirectUrl}`;
       }
     }
 
