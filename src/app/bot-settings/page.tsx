@@ -63,8 +63,8 @@ const defaultCommerceFlowSettings: CommerceFlowSettings = {
     "I could not load the store categories right now. Try asking for best sellers or all products.",
   return_order_prompt: "Sorry it did not work out. Which order?",
   return_reason_prompt:
-    "We're sorry the product wasn't the right fit for you. Please choose the reason for your return so we can assist you better.",
-  return_reason_fallback: "What went wrong: damaged, wrong product, color/size, or changed mind?",
+    "We're sorry the product wasn't the right fit for you. Please choose the reason for your return / exchange so we can assist you better.",
+  return_reason_fallback: "What went wrong: damaged, wrong product, or other?",
   return_cancelled_message: "Okay, I have not started the return. Anything else I can help with?",
   return_confirmation_prompt: "I can check return eligibility first.\n\nShould I continue?",
   return_confirmation_fallback: "{body} Reply Yes or No.",
