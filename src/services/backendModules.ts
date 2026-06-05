@@ -13,8 +13,8 @@ export const ecommerceApi = {
   customers: () => unwrap<unknown[]>(api.get("/ecommerce/customers")),
   bundles: () => unwrap<unknown[]>(api.get("/ecommerce/bundles")),
   syncActive: () => unwrap(api.post("/ecommerce/sync-active")),
-  syncOrders: (connectionId: string) => unwrap(api.post(`/ecommerce/connections/${connectionId}/sync-orders`)),
-  syncProducts: (connectionId: string) => unwrap(api.post(`/ecommerce/connections/${connectionId}/sync-products`)),
+  syncOrders: (connectionId: string) => unwrap(api.post(`/ecommerce/connections/${connectionId}/sync-orders`, { limit: 50 })),
+  syncProducts: (connectionId: string) => unwrap(api.post(`/ecommerce/connections/${connectionId}/sync-products`, { limit: 5000 })),
 };
 
 export const onboardingApi = {
@@ -53,4 +53,3 @@ export const scraperApi = {
   scrape: (website_link: string) => unwrap(api.post("/scrape", { website_link })),
   scrapePartner: (website_link: string) => unwrap(api.post("/scrape/partner", { website_link })),
 };
-
