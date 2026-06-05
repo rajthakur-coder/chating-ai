@@ -14,23 +14,50 @@ export type AutomationRule = {
   updated_at?: string;
 };
 
+export type AutomationTemplate = {
+  id: number;
+  name: string;
+  body: string;
+  channel: string;
+  template_type: string;
+  provider_template_name?: string | null;
+  language: string;
+  body_variable_order: string[];
+  status: string;
+  created_at?: string;
+  updated_at?: string;
+};
+
 export async function getAutomationRules() {
   const response = await api.get<AutomationRule[]>("/automations/rules");
   return response.data;
 }
 
+export async function getAutomationTemplates() {
+  const response = await api.get<AutomationTemplate[]>("/automations/templates");
+  return response.data;
+}
+
 export async function updateAutomationRule({
   ruleId,
+  name,
+  message_template_id,
+  whatsapp_template_id,
+  message_body,
   enabled,
   delay_seconds,
 }: {
   ruleId: number;
+  name?: string;
+  message_template_id?: number | null;
+  whatsapp_template_id?: number | null;
+  message_body?: string | null;
   enabled?: boolean;
   delay_seconds?: number;
 }) {
   const response = await api.patch<{ status: string; rule: AutomationRule }>(
     `/automations/rules/${ruleId}`,
-    { enabled, delay_seconds },
+    { name, message_template_id, whatsapp_template_id, message_body, enabled, delay_seconds },
   );
   return response.data.rule;
 }
