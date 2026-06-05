@@ -13,6 +13,7 @@ import {
   runAgentPreview,
   updateBotSettings,
   updateHeadlessAgentSettings,
+  updateTenantCommerceFlowSettings,
 } from "@/services/botSettings";
 import { ToasterUtils } from "@/components/ui/toast";
 import { Button } from "@/components/Common/Button";
@@ -61,7 +62,8 @@ const defaultCommerceFlowSettings: CommerceFlowSettings = {
   catalog_unavailable_message:
     "I could not load the store categories right now. Try asking for best sellers or all products.",
   return_order_prompt: "Sorry it did not work out. Which order?",
-  return_reason_prompt: "Sorry it did not work out. What went wrong?",
+  return_reason_prompt:
+    "We're sorry the product wasn't the right fit for you. Please choose the reason for your return so we can assist you better.",
   return_reason_fallback: "What went wrong: damaged, wrong product, color/size, or changed mind?",
   return_cancelled_message: "Okay, I have not started the return. Anything else I can help with?",
   return_confirmation_prompt: "I can check return eligibility first.\n\nShould I continue?",
@@ -258,6 +260,7 @@ export default function BotSettingsPage() {
       const [settings] = await Promise.all([
         updateBotSettings(payload),
         updateHeadlessAgentSettings(llmForm, commerceFlowForm),
+        updateTenantCommerceFlowSettings(tenantConfigQuery.data, commerceFlowForm),
       ]);
       return settings;
     },

@@ -117,6 +117,35 @@ export async function getTenantConfig() {
   return response.data.data;
 }
 
+export async function updateTenantCommerceFlowSettings(
+  currentConfig: TenantConfigData | undefined,
+  commerceFlowSettings: CommerceFlowSettings,
+) {
+  const metadata = {
+    ...(currentConfig?.metadata || {}),
+    flow_settings: {
+      ...(currentConfig?.metadata?.flow_settings || {}),
+      commerce: commerceFlowSettings,
+    },
+  };
+
+  const response = await api.put<{ status: string; data: TenantConfigData }>("/tenants/current/config", {
+    brand_name: currentConfig?.brand_name,
+    brand_voice_prompt: currentConfig?.brand_voice_prompt,
+    return_policy: currentConfig?.return_policy,
+    shipping_policy: currentConfig?.shipping_policy,
+    warranty_policy: currentConfig?.warranty_policy,
+    discount_rules: currentConfig?.discount_rules || [],
+    categories: currentConfig?.categories || [],
+    support_email: currentConfig?.support_email,
+    support_sla_hours: currentConfig?.support_sla_hours,
+    default_emoji: currentConfig?.default_emoji,
+    default_tone: currentConfig?.default_tone,
+    metadata,
+  });
+  return response.data.data;
+}
+
 export async function updateHeadlessLlmSettings(settings: LlmReplySettings) {
   const fallbacks =
     settings.fallback_provider && settings.fallback_model

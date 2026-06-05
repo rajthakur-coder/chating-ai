@@ -56,8 +56,8 @@ export default function KnowledgeBasePage() {
         ...emptyKnowledge,
         ...form,
         ...data,
-        policies: form.policies || "",
-        faqs: form.faqs || "",
+        policies: data.policies || form.policies || "",
+        faqs: data.faqs || form.faqs || "",
       };
       setForm(next);
       setWebsiteUrl(next.website_link || websiteUrl);
