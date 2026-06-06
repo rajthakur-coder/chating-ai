@@ -140,6 +140,15 @@ function getVariableIndexes(text: string) {
   );
 }
 
+function variableSamplesFromText(text: string, source: VariableSource): VariableSample[] {
+  return getVariableIndexes(text).map((index) => ({
+    id: `${source}-${index}`,
+    index,
+    source,
+    value: "",
+  }));
+}
+
 export default function TemplateDesignPage() {
   const router = useRouter();
   const [templateId, setTemplateId] = useState<number | undefined>();
@@ -174,6 +183,15 @@ export default function TemplateDesignPage() {
     const params = new URLSearchParams(window.location.search);
     const rawId = params.get("templateId");
     if (!rawId) {
+      const draftBody = params.get("draftBody") || "";
+      if (draftBody) {
+        const draftCategory = params.get("draftCategory") as Category | null;
+        setCategory(draftCategory === "UTILITY" || draftCategory === "MARKETING" ? draftCategory : "MARKETING");
+        setTemplateName(params.get("draftName") || "");
+        setBodyText(draftBody.slice(0, 1024));
+        setVariableType("number");
+        setVariables(variableSamplesFromText(draftBody, "body"));
+      }
       setLoadingTemplate(false);
       return;
     }

@@ -34,11 +34,7 @@ export const sidebarLinks: SidebarLinkItem[] = [
     href: ROUTES.supportTickets,
     icon: "bi:message-rounded-dots",
   },
-  {
-    label: "Automation Settings",
-    href: ROUTES.automationSettings,
-    icon: "ri:settings-3-line",
-  },
+  { label: "Campaigns", href: ROUTES.campaigns, icon: "md:campaign" },
   {
     label: "Bot Logs",
     href: ROUTES.botLogs,
@@ -75,11 +71,15 @@ export const sidebarLinks: SidebarLinkItem[] = [
     icon: "md:contacts",
   },
   {
+    label: "Template Library",
+    href: ROUTES.templateLibrary,
+    icon: "ri:layout-grid-line",
+  },
+  {
     label: "Template Message",
     href: ROUTES.templateMessage,
     icon: "bi:message-rounded-dots",
   },
-  { label: "Campaigns", href: ROUTES.campaigns, icon: "md:campaign" },
   { label: "Flows", href: ROUTES.flows, icon: "ri:flow-chart" },
   {
     label: "Shopify Integration",

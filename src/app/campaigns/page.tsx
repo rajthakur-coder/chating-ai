@@ -3,21 +3,27 @@
 import { useEffect, useMemo, useState } from "react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import {
+  FiActivity,
+  FiBookOpen,
   FiCalendar,
   FiCheckCircle,
   FiClock,
+  FiCpu,
   FiRefreshCw,
   FiSave,
   FiSend,
   FiSliders,
+  FiZap,
 } from "react-icons/fi";
 import { Button } from "@/components/Common/Button";
+import { useRouter } from "next/navigation";
 import CustomInput from "@/components/Common/inputField";
 import StatusBadge from "@/components/Common/StatusBadge";
 import ToggleButton from "@/components/Common/ToggleButton";
 import { ToasterUtils } from "@/components/ui/toast";
 import {
   AutomationRule,
+  type VariableMappings,
   createAutomationRule,
   getAutomationRules,
   getAutomationTemplates,
@@ -177,6 +183,20 @@ const SAMPLE_VALUES: Record<string, string> = {
   product_name: "Airtight Glass Jar",
 };
 
+const COMMON_VARIABLES = [
+  "customer_name",
+  "order_number",
+  "product_name",
+  "total",
+  "currency",
+  "cart_url",
+  "cart_token",
+  "tracking_number",
+  "tracking_url",
+  "email",
+  "phone",
+];
+
 function formatDelay(seconds?: number) {
   const value = Number(seconds || 0);
   if (!value) return "Immediately";
@@ -193,15 +213,47 @@ function getTemplateBody(template?: WhatsappTemplate) {
   return String(body?.text || templateRecord?.body || templateRecord?.format || "");
 }
 
-function getTemplateVariableKeys(text: string) {
+function getTemplateVariableKeys(text: string): string[] {
   return Array.from(new Set(Array.from(text.matchAll(/\{\{\s*([a-zA-Z0-9_.-]+)\s*\}\}/g)).map((match) => match[1])));
 }
 
-function previewText(text: string, variables: string[]) {
+function getButtonVariableKeys(template?: WhatsappTemplate): string[] {
+  const components = Array.isArray(template?.components) ? template.components : [];
+  const buttons = components.find((component) => String(component?.type || "").toUpperCase() === "BUTTONS");
+  const rows: Array<{ url?: string }> = Array.isArray(buttons?.buttons) ? buttons.buttons : [];
+  return rows.flatMap((button: { url?: string }, buttonIndex: number) =>
+    Array.from(String(button?.url || "").matchAll(/\{\{\s*([a-zA-Z0-9_.-]+)\s*\}\}/g)).map(
+      (match, variableIndex) => `button_${buttonIndex}_${match[1] || variableIndex + 1}`,
+    ),
+  );
+}
+
+function defaultMappingFor(campaign: CampaignDefinition, keys: string[]) {
+  const fallback = campaign.variables.length ? campaign.variables : COMMON_VARIABLES;
+  return keys.reduce<Record<string, string>>((acc, key, index) => {
+    acc[key] = fallback[index] || fallback[0] || "customer_name";
+    return acc;
+  }, {});
+}
+
+function mappingToPayload(keys: string[], mapping: Record<string, string>): VariableMappings {
+  return { body: keys.map((key) => mapping[key]).filter(Boolean) };
+}
+
+function mappingFromPayload(keys: string[], payload?: VariableMappings) {
+  const body = Array.isArray(payload?.body) ? payload.body : [];
+  return keys.reduce<Record<string, string>>((acc, key, index) => {
+    if (body[index]) acc[key] = body[index];
+    return acc;
+  }, {});
+}
+
+function previewText(text: string, variables: string[], mapping: Record<string, string>) {
   let output = text || "Select or write a template to preview.";
   variables.forEach((variable, index) => {
-    output = output.replaceAll(`{{${variable}}}`, SAMPLE_VALUES[variable] || `Sample ${variable}`);
-    output = output.replaceAll(`{{${index + 1}}}`, SAMPLE_VALUES[variable] || `Sample ${variable}`);
+    const mappedVariable = mapping[variable] || variable;
+    output = output.replaceAll(`{{${variable}}}`, SAMPLE_VALUES[mappedVariable] || `Sample ${mappedVariable}`);
+    output = output.replaceAll(`{{${index + 1}}}`, SAMPLE_VALUES[mappedVariable] || `Sample ${mappedVariable}`);
   });
   return output;
 }
@@ -213,7 +265,17 @@ function findRule(rules: AutomationRule[], campaign: CampaignDefinition) {
   );
 }
 
+function findWhatsappTemplateForRule(rule: AutomationRule | undefined, templates: WhatsappTemplate[]) {
+  if (!rule?.provider_template_name) return undefined;
+  return templates.find(
+    (template) =>
+      template.name === rule.provider_template_name &&
+      (!rule.template_language || template.language === rule.template_language),
+  );
+}
+
 export default function CampaignsPage() {
+  const router = useRouter();
   const queryClient = useQueryClient();
   const [selectedKey, setSelectedKey] = useState(CAMPAIGNS[0].key);
   const [templateSource, setTemplateSource] = useState<TemplateSource>("whatsapp");
@@ -222,6 +284,8 @@ export default function CampaignsPage() {
   const [delayHours, setDelayHours] = useState(String(CAMPAIGNS[0].defaultDelayHours));
   const [enabled, setEnabled] = useState(true);
   const [customBody, setCustomBody] = useState(CAMPAIGNS[0].defaultBody);
+  const [variableMappings, setVariableMappings] = useState<Record<string, string>>({});
+  const [buttonMappings, setButtonMappings] = useState<Record<string, string>>({});
 
   const selectedCampaign = CAMPAIGNS.find((campaign) => campaign.key === selectedKey) || CAMPAIGNS[0];
 
@@ -265,6 +329,9 @@ export default function CampaignsPage() {
 
   const saveMutation = useMutation({
     mutationFn: async () => {
+      if (enabled && templateSource !== "whatsapp") {
+        throw new Error("Enabled automations require an approved WhatsApp template.");
+      }
       const rule = activeRule;
       const parsedHours = Math.max(0, Number(delayHours) || 0);
       const basePayload = {
@@ -273,6 +340,10 @@ export default function CampaignsPage() {
         delay_seconds: Math.round(parsedHours * 3600),
         enabled,
         conditions: { campaign_key: selectedCampaign.key },
+        variable_mappings: {
+          ...mappingToPayload(variableKeys, variableMappings),
+          buttons: buttonVariableKeys.map((key: string) => buttonMappings[key]).filter(Boolean),
+        },
       };
       const templatePayload =
         templateSource === "whatsapp"
@@ -303,13 +374,29 @@ export default function CampaignsPage() {
       queryClient.invalidateQueries({ queryKey: ["campaign-automation-rules"] });
       queryClient.invalidateQueries({ queryKey: ["campaign-automation-templates"] });
     },
-    onError: () => ToasterUtils.error("Unable to save campaign"),
+    onError: (error) => ToasterUtils.error(error instanceof Error ? error.message : "Unable to save campaign"),
+  });
+
+  const statusMutation = useMutation({
+    mutationFn: ({ ruleId, nextEnabled }: { ruleId: number; nextEnabled: boolean }) =>
+      updateAutomationRule({ ruleId, enabled: nextEnabled }),
+    onSuccess: () => {
+      ToasterUtils.success("Campaign status updated");
+      queryClient.invalidateQueries({ queryKey: ["campaign-automation-rules"] });
+    },
+    onError: () => {
+      ToasterUtils.error("Unable to update campaign status");
+      setEnabled((value) => !value);
+    },
   });
 
   const rules = rulesQuery.data || [];
   const automationTemplates = automationTemplatesQuery.data || [];
   const whatsappTemplates = whatsappTemplatesQuery.data?.data || [];
   const activeRule = findRule(rules, selectedCampaign);
+  const liveCount = rules.filter((rule) => rule.enabled).length;
+  const pausedCount = Math.max(0, rules.length - liveCount);
+  const readyCount = rules.filter((rule) => rule.message_template_id || rule.message_body).length;
 
   const selectedWhatsappTemplate = useMemo(
     () => whatsappTemplates.find((template) => String(template.id) === selectedTemplateId),
@@ -327,14 +414,21 @@ export default function CampaignsPage() {
     setEnabled(rule ? Boolean(rule.enabled) : true);
     setCustomBody(rule?.message_body || selectedCampaign.defaultBody);
 
-    if (rule?.message_template_id) {
+    if (rule?.message_body) {
+      setTemplateSource("text");
+      setSelectedTemplateId("");
+    } else if (rule?.message_template_id && (rule.message_template_type === "whatsapp_template" || rule.provider_template_name)) {
+      const whatsappTemplate = findWhatsappTemplateForRule(rule, whatsappTemplates);
+      setTemplateSource("whatsapp");
+      setSelectedTemplateId(whatsappTemplate ? String(whatsappTemplate.id) : "");
+    } else if (rule?.message_template_id) {
       setTemplateSource("automation");
       setSelectedTemplateId(String(rule.message_template_id));
     } else {
       setTemplateSource("whatsapp");
       setSelectedTemplateId("");
     }
-  }, [selectedCampaign, rules]);
+  }, [automationTemplates, selectedCampaign, rules, whatsappTemplates]);
 
   const sourceBody =
     templateSource === "whatsapp"
@@ -344,18 +438,53 @@ export default function CampaignsPage() {
         : customBody;
   const previewBody = sourceBody || selectedCampaign.defaultBody;
   const variableKeys = getTemplateVariableKeys(previewBody);
-  const canSave =
-    templateSource === "text" ? Boolean(customBody.trim()) : Boolean(selectedTemplateId);
+  const buttonVariableKeys = templateSource === "whatsapp" ? getButtonVariableKeys(selectedWhatsappTemplate) : [];
+  const availableVariables = Array.from(new Set([...selectedCampaign.variables, ...COMMON_VARIABLES]));
+  useEffect(() => {
+    const saved = mappingFromPayload(variableKeys, activeRule?.variable_mappings);
+    const defaults = defaultMappingFor(selectedCampaign, variableKeys);
+    setVariableMappings({ ...defaults, ...saved });
+    const savedButtons = Array.isArray(activeRule?.variable_mappings?.buttons) ? activeRule.variable_mappings.buttons : [];
+    setButtonMappings(
+      buttonVariableKeys.reduce<Record<string, string>>((acc, key, index) => {
+        acc[key] = savedButtons[index] || (selectedCampaign.trigger === "cart_abandoned" ? "cart_token" : "tracking_number");
+        return acc;
+      }, {}),
+    );
+  }, [activeRule?.id, activeRule?.variable_mappings, previewBody, selectedCampaign, selectedWhatsappTemplate]);
+  const hasMessageSource = templateSource === "text" ? Boolean(customBody.trim()) : Boolean(selectedTemplateId);
+  const productionSourceBlocked = enabled && templateSource !== "whatsapp";
+  const canSave = hasMessageSource && !productionSourceBlocked;
+  const sourceNotice =
+    templateSource === "whatsapp"
+      ? "Recommended for live production automations."
+      : productionSourceBlocked
+        ? "Template library drafts and plain text cannot run live. Select an approved WhatsApp template, or save this campaign as paused."
+        : templateSource === "automation"
+          ? "Use this draft copy to prepare a Meta template. It stays paused until an approved WhatsApp template is selected."
+          : "Plain text source. Keep paused unless this is a 24-hour chat-window test.";
+
+  const toggleCampaignStatus = () => {
+    if (statusMutation.isPending) return;
+    const nextEnabled = !enabled;
+    if (nextEnabled && templateSource !== "whatsapp") {
+      ToasterUtils.error("Select an approved WhatsApp template before enabling.");
+      return;
+    }
+    setEnabled(nextEnabled);
+    if (activeRule) {
+      statusMutation.mutate({ ruleId: activeRule.id, nextEnabled });
+    }
+  };
 
   return (
     <div className="mx-auto max-w-7xl space-y-6">
-      <section className="border-b border-default pb-4">
+      <section className="border-b border-default pb-5">
         <div className="flex flex-col gap-3 md:flex-row md:items-end md:justify-between">
           <div>
-            <h1 className="text-2xl font-semibold text-foreground">WhatsApp Automation Campaigns</h1>
-            <p className="mt-2 text-sm text-muted">
-              Connect Shopify events, approved templates, and send timing from one place.
-            </p>
+            <p className="text-xs font-semibold uppercase text-primary">Automation console</p>
+            <h1 className="mt-1 text-2xl font-semibold text-foreground">WhatsApp Campaigns</h1>
+            <p className="mt-2 text-sm text-muted">Lifecycle rules, approved templates, variables, and timing in one workspace.</p>
           </div>
           <div className="flex flex-col gap-2 sm:flex-row">
             <Button
@@ -382,7 +511,14 @@ export default function CampaignsPage() {
         </div>
       </section>
 
-      <section className="grid gap-6 lg:grid-cols-[330px_minmax(0,1fr)]">
+      <section className="grid gap-3 md:grid-cols-4">
+        <MetricTile icon={FiActivity} label="Total campaigns" value={String(CAMPAIGNS.length)} />
+        <MetricTile icon={FiZap} label="Live campaigns" value={String(liveCount)} />
+        <MetricTile icon={FiClock} label="Paused campaigns" value={String(pausedCount)} />
+        <MetricTile icon={FiCpu} label="Ready campaigns" value={String(readyCount)} />
+      </section>
+
+      <section className="grid gap-6 lg:grid-cols-[360px_minmax(0,1fr)]">
         <div className="space-y-3">
           {CAMPAIGNS.map((campaign) => {
             const rule = findRule(rules, campaign);
@@ -393,14 +529,17 @@ export default function CampaignsPage() {
                 type="button"
                 onClick={() => setSelectedKey(campaign.key)}
                 className={`w-full rounded-md border px-4 py-3 text-left transition ${
-                  selected ? "border-primary bg-primary/5" : "border-default bg-surface hover:bg-surface-hover"
+                  selected ? "border-primary bg-primary/5 shadow-sm" : "border-default bg-surface hover:bg-surface-hover"
                 }`}
               >
                 <div className="flex items-start justify-between gap-3">
                   <div>
                     <p className="font-semibold text-foreground">{campaign.title}</p>
                     <p className="mt-1 text-xs leading-5 text-muted">{campaign.description}</p>
-                    <p className="mt-2 text-xs text-muted">{campaign.timingLabel}</p>
+                    <div className="mt-3 flex flex-wrap gap-2 text-[11px] text-muted">
+                      <span className="rounded border border-default bg-white px-2 py-1">{campaign.trigger}</span>
+                      <span className="rounded border border-default bg-white px-2 py-1">{rule ? formatDelay(rule.delay_seconds) : campaign.timingLabel}</span>
+                    </div>
                   </div>
                   <StatusBadge
                     status={rule?.enabled ? "Active" : rule ? "Inactive" : "Pending"}
@@ -414,7 +553,7 @@ export default function CampaignsPage() {
         </div>
 
         <div className="space-y-6">
-          <section className="rounded-lg border border-default bg-surface p-5">
+          <section className="rounded-lg border border-default bg-surface p-5 shadow-sm">
             <div className="flex flex-col gap-4 border-b border-default pb-4 md:flex-row md:items-start md:justify-between">
               <div>
                 <h2 className="text-lg font-semibold text-foreground">{selectedCampaign.title}</h2>
@@ -422,10 +561,15 @@ export default function CampaignsPage() {
                 <p className="mt-2 text-xs text-muted">{selectedCampaign.readyNote}</p>
               </div>
               <div className="inline-flex items-center gap-3">
-                <ToggleButton isOn={enabled} size="sm" onToggle={() => setEnabled((value) => !value)} />
+                <ToggleButton
+                  isOn={enabled}
+                  size="sm"
+                  onToggle={toggleCampaignStatus}
+                />
                 <StatusBadge
                   status={enabled ? "Active" : "Inactive"}
                   displayText={enabled ? "Enabled" : "Paused"}
+                  loading={statusMutation.isPending}
                   className="cursor-default"
                 />
               </div>
@@ -459,11 +603,34 @@ export default function CampaignsPage() {
                       }}
                       className="h-[45px] rounded-[5px] border border-gray-300 bg-white px-3 text-sm text-[#0d0c22] outline-none focus:border-[#818cf8] focus:ring-[3px] focus:ring-[#818cf8]/30"
                     >
-                      <option value="whatsapp">Approved WhatsApp templates</option>
-                      <option value="automation">Automation templates</option>
-                      <option value="text">Plain text fallback</option>
+                      <option value="whatsapp">Approved WhatsApp Template - recommended</option>
+                      {templateSource === "automation" ? (
+                        <option value="automation">Template Library Draft - not live</option>
+                      ) : null}
+                      <option value="text">Plain Text Message - testing / 24h chat only</option>
                     </select>
+                    <p className={`text-xs ${productionSourceBlocked ? "text-red-600" : "text-muted"}`}>
+                      {sourceNotice}
+                    </p>
                   </div>
+                </div>
+
+                <div className="flex flex-col gap-3 rounded-md border border-default bg-white p-3 md:flex-row md:items-center md:justify-between">
+                  <div>
+                    <p className="text-sm font-semibold text-foreground">Need a campaign draft?</p>
+                    <p className="mt-1 text-xs text-muted">
+                      Open the library, customize a draft, submit it to Meta, then attach the approved template here.
+                    </p>
+                  </div>
+                  <Button
+                    text="Create from Library"
+                    icon={FiBookOpen}
+                    variant="outline"
+                    color="surface"
+                    size="sm"
+                    onClick={() => router.push("/template-library")}
+                    fullWidthOnMobile
+                  />
                 </div>
 
                 {templateSource === "text" ? (
@@ -486,7 +653,7 @@ export default function CampaignsPage() {
                       className="h-[45px] rounded-[5px] border border-gray-300 bg-white px-3 text-sm text-[#0d0c22] outline-none focus:border-[#818cf8] focus:ring-[3px] focus:ring-[#818cf8]/30"
                     >
                       <option value="">
-                        {templateSource === "whatsapp" ? "Select approved WhatsApp template" : "Select automation template"}
+                        {templateSource === "whatsapp" ? "Select approved WhatsApp template" : "Select template library draft"}
                       </option>
                       {templateSource === "whatsapp"
                         ? whatsappTemplates.map((template) => (
@@ -500,6 +667,62 @@ export default function CampaignsPage() {
                             </option>
                           ))}
                     </select>
+                    {templateSource === "automation" ? (
+                      <p className="text-xs text-muted">
+                        Drafts help you start faster. Submit the final copy to Meta, then select the approved template to go live.
+                      </p>
+                    ) : null}
+                  </div>
+                )}
+
+                {(variableKeys.length > 0 || buttonVariableKeys.length > 0) && (
+                  <div className="rounded-md border border-default bg-white p-3">
+                    <div className="mb-3 flex items-center justify-between gap-3">
+                      <label className="text-sm font-medium text-gray-800">Variable mapping</label>
+                      <span className="text-xs text-muted">{variableKeys.length + buttonVariableKeys.length} fields</span>
+                    </div>
+                    <div className="grid gap-3 md:grid-cols-2">
+                      {variableKeys.map((variable) => (
+                        <div key={variable} className="min-w-0 rounded-md border border-default bg-surface p-2">
+                          <span className="block truncate rounded border border-default bg-white px-2 py-1.5 text-xs font-semibold text-foreground">
+                            {`{{${variable}}}`}
+                          </span>
+                          <select
+                            value={variableMappings[variable] || ""}
+                            onChange={(event) =>
+                              setVariableMappings((current) => ({ ...current, [variable]: event.target.value }))
+                            }
+                            className="mt-2 h-[38px] w-full min-w-0 rounded-[5px] border border-gray-300 bg-white px-2 text-sm text-[#0d0c22] outline-none focus:border-[#818cf8] focus:ring-[3px] focus:ring-[#818cf8]/30"
+                          >
+                            {availableVariables.map((field) => (
+                              <option key={field} value={field}>
+                                {field}
+                              </option>
+                            ))}
+                          </select>
+                        </div>
+                      ))}
+                      {buttonVariableKeys.map((variable) => (
+                        <div key={variable} className="min-w-0 rounded-md border border-default bg-surface p-2">
+                          <span className="block truncate rounded border border-default bg-white px-2 py-1.5 text-xs font-semibold text-foreground">
+                            Button
+                          </span>
+                          <select
+                            value={buttonMappings[variable] || ""}
+                            onChange={(event) =>
+                              setButtonMappings((current) => ({ ...current, [variable]: event.target.value }))
+                            }
+                            className="mt-2 h-[38px] w-full min-w-0 rounded-[5px] border border-gray-300 bg-white px-2 text-sm text-[#0d0c22] outline-none focus:border-[#818cf8] focus:ring-[3px] focus:ring-[#818cf8]/30"
+                          >
+                            {availableVariables.map((field) => (
+                              <option key={field} value={field}>
+                                {field}
+                              </option>
+                            ))}
+                          </select>
+                        </div>
+                      ))}
+                    </div>
                   </div>
                 )}
 
@@ -527,7 +750,7 @@ export default function CampaignsPage() {
                   Message preview
                 </div>
                 <div className="mt-4 rounded-md bg-white p-4 text-sm leading-6 text-foreground shadow-sm">
-                  {previewText(previewBody, variableKeys.length ? variableKeys : selectedCampaign.variables)}
+                  {previewText(previewBody, variableKeys.length ? variableKeys : selectedCampaign.variables, variableMappings)}
                 </div>
                 <dl className="mt-4 space-y-2 text-xs text-muted">
                   <div className="flex justify-between gap-3">
@@ -550,6 +773,18 @@ export default function CampaignsPage() {
           </section>
         </div>
       </section>
+    </div>
+  );
+}
+
+function MetricTile({ icon: Icon, label, value }: { icon: typeof FiClock; label: string; value: string }) {
+  return (
+    <div className="rounded-md border border-default bg-surface px-4 py-3">
+      <div className="flex items-center justify-between gap-3">
+        <p className="text-xs font-medium uppercase text-muted">{label}</p>
+        <Icon className="h-4 w-4 text-primary" />
+      </div>
+      <p className="mt-2 text-2xl font-semibold text-foreground">{value}</p>
     </div>
   );
 }

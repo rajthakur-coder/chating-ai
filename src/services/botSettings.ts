@@ -49,8 +49,6 @@ export type CommerceFlowSettings = {
   gifting_timeline_prompt: string;
   gifting_timeline_fallback: string;
   gifting_email_prompt: string;
-  checkout_cta_message: string;
-  checkout_cta_button: string;
   bundle_push_message: string;
   first_time_offer_with_code: string;
   first_time_offer_no_code: string;

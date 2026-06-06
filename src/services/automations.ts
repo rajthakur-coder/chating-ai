@@ -6,12 +6,21 @@ export type AutomationRule = {
   name: string;
   trigger: string;
   message_template_id?: number | null;
+  message_template_type?: string | null;
+  provider_template_name?: string | null;
+  template_language?: string | null;
   message_body?: string | null;
   delay_seconds: number;
   conditions?: Record<string, unknown>;
+  variable_mappings?: VariableMappings;
   enabled: boolean;
   created_at?: string;
   updated_at?: string;
+};
+
+export type VariableMappings = {
+  body?: string[];
+  buttons?: string[];
 };
 
 export type AutomationTemplate = {
@@ -46,6 +55,7 @@ export async function updateAutomationRule({
   message_body,
   enabled,
   delay_seconds,
+  variable_mappings,
 }: {
   ruleId: number;
   name?: string;
@@ -54,10 +64,11 @@ export async function updateAutomationRule({
   message_body?: string | null;
   enabled?: boolean;
   delay_seconds?: number;
+  variable_mappings?: VariableMappings;
 }) {
   const response = await api.patch<{ status: string; rule: AutomationRule }>(
     `/automations/rules/${ruleId}`,
-    { name, message_template_id, whatsapp_template_id, message_body, enabled, delay_seconds },
+    { name, message_template_id, whatsapp_template_id, message_body, enabled, delay_seconds, variable_mappings },
   );
   return response.data.rule;
 }
@@ -71,6 +82,7 @@ export async function createAutomationRule({
   enabled,
   delay_seconds,
   conditions,
+  variable_mappings,
 }: {
   name: string;
   trigger: string;
@@ -80,6 +92,7 @@ export async function createAutomationRule({
   enabled?: boolean;
   delay_seconds?: number;
   conditions?: Record<string, unknown>;
+  variable_mappings?: VariableMappings;
 }) {
   const response = await api.post<{ status: string; rule: AutomationRule }>("/automations/rules", {
     name,
@@ -90,6 +103,7 @@ export async function createAutomationRule({
     enabled,
     delay_seconds,
     conditions,
+    variable_mappings,
   });
   return response.data.rule;
 }

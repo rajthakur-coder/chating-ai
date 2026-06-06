@@ -4,6 +4,7 @@ export const ROUTES = {
   comingSoon: "/coming-soon",
   contacts: "/contacts",
   profile: "/profile",
+  templateLibrary: "/template-library",
   templateMessage: "/template-message",
   campaigns: "/campaigns",
   supportTickets: "/support-tickets",
