@@ -18,7 +18,6 @@ export const ROUTES = {
   aiAgentApis: "/ai-agent-apis",
   ecommerce: "/ecommerce",
   onboarding: "/onboarding",
-  compliance: "/compliance",
   agency: "/agency",
   flows: "/coming-soon",
   shopifyIntegration: "/shopify-integration",

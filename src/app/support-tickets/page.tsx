@@ -2,7 +2,16 @@
 
 import { useMemo, useState } from "react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { FiCheckCircle, FiRefreshCw } from "react-icons/fi";
+import {
+  FiAlertCircle,
+  FiCheckCircle,
+  FiClock,
+  FiMessageSquare,
+  FiRefreshCw,
+  FiRotateCcw,
+  FiShield,
+  FiUserCheck,
+} from "react-icons/fi";
 import {
   getHandoffs,
   HandoffTicket,
@@ -37,10 +46,83 @@ function formatDateTime(value?: string | null) {
   });
 }
 
+function getAgeHours(value?: string | null) {
+  if (!value) return null;
+  const date = new Date(value);
+  if (Number.isNaN(date.getTime())) return null;
+  return Math.max(0, Math.floor((Date.now() - date.getTime()) / 36e5));
+}
+
+function formatAge(value?: string | null) {
+  const hours = getAgeHours(value);
+  if (hours === null) return "No timestamp";
+  if (hours < 1) return "Just now";
+  if (hours < 24) return `${hours}h open`;
+  return `${Math.floor(hours / 24)}d open`;
+}
+
 function compactSummary(summary?: string | null) {
   const text = (summary || "").trim();
   if (!text) return "No conversation summary yet.";
-  return text.length > 260 ? `${text.slice(0, 260)}...` : text;
+  return text.length > 220 ? `${text.slice(0, 220)}...` : text;
+}
+
+function cleanReason(reason?: string | null) {
+  return (reason || "customer_requested_human").replaceAll("_", " ");
+}
+
+function getPriority(ticket: HandoffTicket) {
+  if (ticket.status !== "open") return { label: "Closed", className: "bg-slate-100 text-slate-600" };
+  const hours = getAgeHours(ticket.updated_at || ticket.created_at) ?? 0;
+  if (hours >= 24) return { label: "High", className: "bg-rose-100 text-rose-700" };
+  if (hours >= 8) return { label: "Medium", className: "bg-amber-100 text-amber-700" };
+  return { label: "Normal", className: "bg-emerald-100 text-emerald-700" };
+}
+
+function MetricTile({
+  label,
+  value,
+  detail,
+  icon: Icon,
+  tone,
+}: {
+  label: string;
+  value: string | number;
+  detail: string;
+  icon: typeof FiMessageSquare;
+  tone: string;
+}) {
+  return (
+    <div className="rounded-lg border border-default bg-surface p-4 shadow-sm">
+      <div className="flex items-start justify-between gap-3">
+        <div>
+          <p className="text-xs font-semibold uppercase tracking-wide text-muted">{label}</p>
+          <p className="mt-2 text-3xl font-semibold text-foreground">{value}</p>
+        </div>
+        <span className={`flex h-10 w-10 items-center justify-center rounded-md ${tone}`}>
+          <Icon size={18} />
+        </span>
+      </div>
+      <p className="mt-3 text-sm text-muted">{detail}</p>
+    </div>
+  );
+}
+
+function TicketSkeleton() {
+  return (
+    <div className="grid gap-4 border-b border-default px-5 py-5 last:border-b-0 lg:grid-cols-[1.1fr_1.3fr_280px]">
+      <div className="space-y-3">
+        <div className="h-4 w-28 rounded bg-slate-200" />
+        <div className="h-3 w-44 rounded bg-slate-100" />
+      </div>
+      <div className="space-y-3">
+        <div className="h-4 w-56 rounded bg-slate-200" />
+        <div className="h-3 w-full rounded bg-slate-100" />
+        <div className="h-3 w-2/3 rounded bg-slate-100" />
+      </div>
+      <div className="h-24 rounded-md bg-slate-100" />
+    </div>
+  );
 }
 
 export default function SupportTicketsPage() {
@@ -78,8 +160,11 @@ export default function SupportTicketsPage() {
 
   const allTickets = ticketsQuery.data || [];
   const counts = useMemo(() => {
+    const open = allTickets.filter((ticket) => ticket.status === "open");
+    const aged = open.filter((ticket) => (getAgeHours(ticket.updated_at || ticket.created_at) ?? 0) >= 8);
     return {
-      open: allTickets.filter((ticket) => ticket.status === "open").length,
+      open: open.length,
+      aged: aged.length,
       closed: allTickets.filter((ticket) => ticket.status === "closed").length,
       total: allTickets.length,
     };
@@ -89,6 +174,7 @@ export default function SupportTicketsPage() {
     if (!status) return allTickets;
     return allTickets.filter((ticket) => ticket.status === status);
   }, [allTickets, status]);
+
   const totalPages = Math.max(1, Math.ceil(tickets.length / pageSize));
   const paginatedTickets = useMemo(() => {
     const start = (currentPage - 1) * pageSize;
@@ -105,20 +191,23 @@ export default function SupportTicketsPage() {
   };
 
   return (
-    <div className="mx-auto flex max-w-7xl flex-col gap-5">
-      <section className="border-b border-default pb-4">
-        <div className="flex flex-col gap-4 md:flex-row md:items-end md:justify-between">
+    <div className="mx-auto flex max-w-7xl flex-col gap-6">
+      <section className="border-b border-default pb-5">
+        <div className="flex flex-col gap-4 lg:flex-row lg:items-end lg:justify-between">
           <div>
+            <div className="mb-3 flex w-fit items-center gap-2 rounded-md border border-default bg-surface px-3 py-1 text-xs font-semibold uppercase tracking-wide text-muted">
+              <FiShield size={14} />
+              Handoff Operations
+            </div>
             <h1 className="text-2xl font-semibold text-foreground">
               Support Tickets
             </h1>
-            <p className="mt-2 text-sm text-muted">
-              Resolve human handoff tickets to let the WhatsApp AI bot reply to
-              that customer again.
+            <p className="mt-2 max-w-3xl text-sm leading-6 text-muted">
+              Prioritize customer handoffs, capture resolution notes, and resume WhatsApp bot replies from a focused support queue.
             </p>
           </div>
           <Button
-            text="Refresh"
+            text="Refresh Queue"
             icon={FiRefreshCw}
             variant="outline"
             color="surface"
@@ -131,119 +220,186 @@ export default function SupportTicketsPage() {
         </div>
       </section>
 
-      <section className="flex flex-col gap-3 lg:flex-row lg:items-center lg:justify-between">
-        <Tabs
-          tabs={statusTabs.map((tab) => ({ key: tab.value || "all", name: tab.label }))}
-          selectedTab={status || "all"}
-          onTabChange={(value) => {
-            setStatus(value === "all" ? "" : (value as StatusFilter));
-            setCurrentPage(1);
-          }}
+      <section className="grid gap-4 md:grid-cols-2 xl:grid-cols-4">
+        <MetricTile
+          label="Open Queue"
+          value={counts.open}
+          detail="Customers waiting for a human reply."
+          icon={FiMessageSquare}
+          tone="bg-blue-50 text-blue-700"
         />
-        <span className="ml-auto self-center text-sm text-muted">
-          Open {counts.open} · Closed {counts.closed} · Total {counts.total}
-        </span>
+        <MetricTile
+          label="Needs Attention"
+          value={counts.aged}
+          detail="Open tickets older than 8 hours."
+          icon={FiAlertCircle}
+          tone="bg-amber-50 text-amber-700"
+        />
+        <MetricTile
+          label="Resolved"
+          value={counts.closed}
+          detail="Tickets closed with bot replies resumed."
+          icon={FiUserCheck}
+          tone="bg-emerald-50 text-emerald-700"
+        />
+        <MetricTile
+          label="Total Handoffs"
+          value={counts.total}
+          detail="All customer handoff records."
+          icon={FiClock}
+          tone="bg-slate-100 text-slate-700"
+        />
       </section>
 
-      <section className="flex flex-col rounded-lg border border-default bg-surface">
-        <div className="grid grid-cols-[96px_1.1fr_1fr_1.6fr] border-b border-default bg-surface-strong px-4 py-3 text-xs font-semibold uppercase text-muted">
-          <span>Ticket</span>
+      <section className="rounded-lg border border-default bg-surface shadow-sm">
+        <div className="flex flex-col gap-4 border-b border-default px-5 py-4 lg:flex-row lg:items-center lg:justify-between">
+          <div>
+            <h2 className="text-lg font-semibold text-foreground">Agent Queue</h2>
+            <p className="mt-1 text-sm text-muted">
+              Showing {tickets.length} {status || "total"} tickets.
+            </p>
+          </div>
+          <Tabs
+            tabs={statusTabs.map((tab) => ({ key: tab.value || "all", name: tab.label }))}
+            selectedTab={status || "all"}
+            onTabChange={(value) => {
+              setStatus(value === "all" ? "" : (value as StatusFilter));
+              setCurrentPage(1);
+            }}
+          />
+        </div>
+
+        <div className="hidden grid-cols-[1.1fr_1.3fr_280px] border-b border-default bg-surface-strong px-5 py-3 text-xs font-semibold uppercase tracking-wide text-muted lg:grid">
           <span>Customer</span>
-          <span>Reason</span>
-          <span>Action</span>
+          <span>Conversation Context</span>
+          <span>Resolution Action</span>
         </div>
 
         <div>
           {ticketsQuery.isLoading ? (
-            <div className="px-4 py-10 text-center text-sm text-muted">
-              Loading tickets...
-            </div>
+            <>
+              <TicketSkeleton />
+              <TicketSkeleton />
+              <TicketSkeleton />
+            </>
           ) : null}
 
           {ticketsQuery.isError ? (
-            <div className="px-4 py-10 text-center text-sm text-rose-600">
-              Unable to load support tickets.
+            <div className="px-5 py-14 text-center">
+              <div className="mx-auto flex h-12 w-12 items-center justify-center rounded-md bg-rose-50 text-rose-600">
+                <FiAlertCircle size={22} />
+              </div>
+              <p className="mt-4 font-semibold text-foreground">Unable to load support tickets</p>
+              <p className="mt-1 text-sm text-muted">Refresh the queue once the backend is reachable.</p>
             </div>
           ) : null}
 
           {!ticketsQuery.isLoading && !ticketsQuery.isError && tickets.length === 0 ? (
-            <div className="px-4 py-10 text-center text-sm text-muted">
-              No tickets found.
+            <div className="px-5 py-14 text-center">
+              <div className="mx-auto flex h-12 w-12 items-center justify-center rounded-md bg-emerald-50 text-emerald-700">
+                <FiCheckCircle size={22} />
+              </div>
+              <p className="mt-4 font-semibold text-foreground">No tickets in this view</p>
+              <p className="mt-1 text-sm text-muted">The queue is clear for the selected status.</p>
             </div>
           ) : null}
 
-          {paginatedTickets.map((ticket) => (
-            <div
-              key={ticket.id}
-              className="grid grid-cols-1 gap-4 border-b border-default px-4 py-4 last:border-b-0 lg:grid-cols-[96px_1.1fr_1fr_1.6fr]"
-            >
-              <div>
-                <p className="font-semibold text-foreground">#{ticket.id}</p>
-                <StatusBadge
-                  status={ticket.status === "open" ? "Pending" : "Success"}
-                  displayText={ticket.status}
-                  className="mt-2 cursor-default"
-                />
-              </div>
-
-              <div>
-                <p className="font-medium text-foreground">{ticket.phone}</p>
-                <p className="mt-1 text-xs text-muted">
-                  Updated {formatDateTime(ticket.updated_at)}
-                </p>
-              </div>
-
-              <div>
-                <p className="text-sm text-foreground">
-                  {ticket.reason || "customer_requested_human"}
-                </p>
-                <p className="mt-2 whitespace-pre-line text-xs leading-5 text-muted">
-                  {compactSummary(ticket.summary)}
-                </p>
-              </div>
-
-              <div className="space-y-3">
-                {ticket.status === "open" ? (
-                  <>
-                    <CustomInput
-                      value={notes[ticket.id] || ""}
-                      onChange={(value) =>
-                        setNotes((current) => ({
-                          ...current,
-                          [ticket.id]: value,
-                        }))
-                      }
-                      placeholder="Resolution note"
-                      multiline
-                      rows={3}
+          {paginatedTickets.map((ticket) => {
+            const priority = getPriority(ticket);
+            return (
+              <article
+                key={ticket.id}
+                className="grid gap-5 border-b border-default px-5 py-5 transition hover:bg-surface-strong/60 last:border-b-0 lg:grid-cols-[1.1fr_1.3fr_280px]"
+              >
+                <div className="min-w-0">
+                  <div className="flex flex-wrap items-center gap-2">
+                    <p className="font-semibold text-foreground">#{ticket.id}</p>
+                    <StatusBadge
+                      status={ticket.status === "open" ? "Pending" : "Success"}
+                      displayText={ticket.status}
+                      className="cursor-default"
                     />
-                    <Button
-                      text="Resolve and Resume Bot"
-                      icon={FiCheckCircle}
-                      onClick={() => resolveTicket(ticket)}
-                      disabled={isMutating}
-                      loading={resolveMutation.isPending}
-                      loaderType="bounce"
-                      size="sm"
-                      fullWidthOnMobile
-                    />
-                  </>
-                ) : (
-                  <Button
-                    text="Reopen Ticket"
-                    onClick={() => reopenMutation.mutate(ticket.id)}
-                    disabled={isMutating}
-                    loading={reopenMutation.isPending}
-                    loaderType="bounce"
-                    variant="outline"
-                    color="surface"
-                    size="sm"
-                    fullWidthOnMobile
-                  />
-                )}
-              </div>
-            </div>
-          ))}
+                    <span className={`rounded-md px-2 py-1 text-xs font-semibold ${priority.className}`}>
+                      {priority.label}
+                    </span>
+                  </div>
+                  <p className="mt-3 truncate text-base font-semibold text-foreground">
+                    {ticket.phone || "Unknown customer"}
+                  </p>
+                  <div className="mt-3 grid gap-2 text-xs text-muted sm:grid-cols-2 lg:grid-cols-1">
+                    <span>Created {formatDateTime(ticket.created_at)}</span>
+                    <span>Updated {formatDateTime(ticket.updated_at)}</span>
+                  </div>
+                </div>
+
+                <div className="min-w-0">
+                  <div className="flex flex-wrap items-center gap-2">
+                    <span className="rounded-md bg-white px-2 py-1 text-xs font-semibold capitalize text-slate-700 ring-1 ring-default dark:bg-slate-950 dark:text-slate-200">
+                      {cleanReason(ticket.reason)}
+                    </span>
+                    <span className="inline-flex items-center gap-1 text-xs font-semibold text-muted">
+                      <FiClock size={13} />
+                      {formatAge(ticket.updated_at || ticket.created_at)}
+                    </span>
+                  </div>
+                  <p className="mt-3 whitespace-pre-line text-sm leading-6 text-muted">
+                    {compactSummary(ticket.summary)}
+                  </p>
+                </div>
+
+                <div className="rounded-md border border-default bg-white p-3 dark:bg-slate-950">
+                  {ticket.status === "open" ? (
+                    <div className="space-y-3">
+                      <CustomInput
+                        value={notes[ticket.id] || ""}
+                        onChange={(value) =>
+                          setNotes((current) => ({
+                            ...current,
+                            [ticket.id]: value,
+                          }))
+                        }
+                        placeholder="Add resolution note"
+                        multiline
+                        rows={3}
+                      />
+                      <Button
+                        text="Resolve"
+                        icon={FiCheckCircle}
+                        onClick={() => resolveTicket(ticket)}
+                        disabled={isMutating}
+                        loading={resolveMutation.isPending}
+                        loaderType="bounce"
+                        size="sm"
+                        className="w-full"
+                      />
+                      <p className="text-xs leading-5 text-muted">
+                        Closing resumes automated replies for this customer.
+                      </p>
+                    </div>
+                  ) : (
+                    <div className="space-y-3">
+                      <p className="text-sm font-medium text-foreground">Ticket is closed</p>
+                      <p className="text-xs leading-5 text-muted">
+                        Reopen only if the customer needs human handling again.
+                      </p>
+                      <Button
+                        text="Reopen"
+                        icon={FiRotateCcw}
+                        onClick={() => reopenMutation.mutate(ticket.id)}
+                        disabled={isMutating}
+                        loading={reopenMutation.isPending}
+                        loaderType="bounce"
+                        variant="outline"
+                        color="surface"
+                        size="sm"
+                        className="w-full"
+                      />
+                    </div>
+                  )}
+                </div>
+              </article>
+            );
+          })}
         </div>
 
         {!ticketsQuery.isLoading && !ticketsQuery.isError && tickets.length > pageSize ? (

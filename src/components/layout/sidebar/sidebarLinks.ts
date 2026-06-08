@@ -36,19 +36,9 @@ export const sidebarLinks: SidebarLinkItem[] = [
   },
   { label: "Campaigns", href: ROUTES.campaigns, icon: "md:campaign" },
   {
-    label: "Bot Logs",
-    href: ROUTES.botLogs,
-    icon: "bi:refresh",
-  },
-  {
     label: "Analytics",
     href: ROUTES.whatsappAnalytics,
     icon: "fi:bar-chart-2",
-  },
-  {
-    label: "AI Agent APIs",
-    href: ROUTES.aiAgentApis,
-    icon: "ri:terminal-box-line",
   },
   {
     label: "Ecommerce",
@@ -61,16 +51,6 @@ export const sidebarLinks: SidebarLinkItem[] = [
     icon: "ri:flow-chart",
   },
   {
-    label: "Compliance",
-    href: ROUTES.compliance,
-    icon: "ri:settings-3-line",
-  },
-  {
-    label: "Agency",
-    href: ROUTES.agency,
-    icon: "md:contacts",
-  },
-  {
     label: "Template Library",
     href: ROUTES.templateLibrary,
     icon: "ri:layout-grid-line",
@@ -80,7 +60,6 @@ export const sidebarLinks: SidebarLinkItem[] = [
     href: ROUTES.templateMessage,
     icon: "bi:message-rounded-dots",
   },
-  { label: "Flows", href: ROUTES.flows, icon: "ri:flow-chart" },
   {
     label: "Shopify Integration",
     href: ROUTES.shopifyIntegration,
