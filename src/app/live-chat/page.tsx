@@ -77,6 +77,16 @@ function mapContactToChat(contact: LiveChatContact): Chat {
 function playIncomingMessageSound() {
   if (typeof window === "undefined") return;
 
+  const audio = new Audio("/sounds/recieve_message.mp3");
+  audio.volume = 0.8;
+  audio.play().catch(() => {
+    playFallbackIncomingMessageSound();
+  });
+}
+
+function playFallbackIncomingMessageSound() {
+  if (typeof window === "undefined") return;
+
   const AudioContextClass =
     window.AudioContext ||
     (window as typeof window & { webkitAudioContext?: typeof AudioContext })
