@@ -23,6 +23,18 @@ function DatePill({ children }: { children: React.ReactNode }) {
   );
 }
 
+function mediaUrl(value?: string) {
+  if (!value) return "";
+  if (/^(https?:|data:|blob:)/i.test(value)) return value;
+  const apiBase = process.env.NEXT_PUBLIC_API_URL?.replace(/\/$/, "") || "";
+  return value.startsWith("/") && apiBase ? `${apiBase}${value}` : value;
+}
+
+function mediaCaption(message: LiveChatMessage, caption?: string) {
+  const text = displayMessageText(message);
+  return caption || (/^(Image|Video|Audio|Voice message|Document|Sticker)$/i.test(text) ? "" : text);
+}
+
 function RichMessageContent({
   message,
 }: {
@@ -80,6 +92,100 @@ function RichMessageContent({
           ))}
         </div>
       </div>
+    );
+  }
+
+  if (type === "image" || type === "sticker") {
+    const title = type === "sticker" ? "Sticker" : "Image";
+    const src = mediaUrl(payload.image_url || payload.sticker_url || payload.media_url);
+    const caption = mediaCaption(message, payload.caption);
+    return (
+      <div className="w-[300px] max-w-[72vw] overflow-hidden rounded-lg">
+        {src ? (
+          <img
+            src={src}
+            alt={caption || title}
+            className="max-h-72 w-full rounded-md object-contain"
+          />
+        ) : (
+          <div className="flex h-40 items-center justify-center rounded-md bg-surface-strong text-muted">
+            <Icon name="fi:image" size={24} />
+          </div>
+        )}
+        {caption ? (
+          <p className="mt-2 whitespace-pre-wrap text-sm leading-5">{caption}</p>
+        ) : null}
+      </div>
+    );
+  }
+
+  if (type === "video") {
+    const src = mediaUrl(payload.video_url || payload.media_url);
+    const caption = mediaCaption(message, payload.caption);
+    return (
+      <div className="w-[360px] max-w-[78vw] overflow-hidden rounded-lg">
+        {src ? (
+          <video
+            src={src}
+            controls
+            preload="metadata"
+            className="max-h-80 w-full rounded-md bg-black"
+          />
+        ) : (
+          <div className="flex h-44 items-center justify-center rounded-md bg-surface-strong text-muted">
+            <Icon name="fi:video" size={24} />
+          </div>
+        )}
+        {caption ? (
+          <p className="mt-2 whitespace-pre-wrap text-sm leading-5">{caption}</p>
+        ) : null}
+      </div>
+    );
+  }
+
+  if (type === "audio") {
+    const src = mediaUrl(payload.audio_url || payload.media_url);
+    const title = payload.voice ? "Voice message" : "Audio";
+    return (
+      <div className="min-w-[280px] max-w-[72vw]">
+        <div className="mb-2 flex items-center gap-2 text-sm font-semibold">
+          <Icon name="fi:mic" size={16} />
+          <span>{title}</span>
+        </div>
+        {src ? (
+          <audio src={src} controls preload="metadata" className="w-full" />
+        ) : (
+          <div className="rounded-md bg-surface-strong px-3 py-2 text-sm text-muted">
+            Audio unavailable
+          </div>
+        )}
+      </div>
+    );
+  }
+
+  if (type === "document") {
+    const href = mediaUrl(payload.document_url || payload.media_url);
+    const filename = payload.filename || displayMessageText(message) || "Document";
+    const content = (
+      <div className="flex min-w-[260px] max-w-[72vw] items-center gap-3 rounded-md border border-default bg-white p-3 shadow-sm dark:bg-slate-900">
+        <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-md bg-surface-strong text-emerald-700 dark:text-emerald-300">
+          <Icon name="fi:file" size={20} />
+        </div>
+        <div className="min-w-0 flex-1">
+          <p className="truncate text-sm font-semibold text-foreground">{filename}</p>
+          {payload.mime_type ? (
+            <p className="truncate text-xs text-muted">{payload.mime_type}</p>
+          ) : null}
+        </div>
+        <Icon name="fi:download" size={18} className="text-muted" />
+      </div>
+    );
+    return href ? (
+      <a href={href} target="_blank" rel="noreferrer">
+        {content}
+      </a>
+    ) : (
+      content
     );
   }
 

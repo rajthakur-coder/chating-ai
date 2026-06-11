@@ -57,7 +57,7 @@ export function richPayload(value: unknown): RichMessagePayload {
 
 export function isWideRichMessage(message: LiveChatMessage) {
   const type = String(message.message_type || "text");
-  return type === "carousel" || type === "product_list";
+  return ["carousel", "product_list", "image", "video", "audio", "document", "sticker"].includes(type);
 }
 
 function placeholderLabel(text: string, prefix: string) {
@@ -98,6 +98,12 @@ export function displayMessageText(message: LiveChatMessage) {
 
   const pageMatch = rawText.match(/^catalog page\s+\d+$/i);
   if (pageMatch) return "Next categories";
+
+  const mediaPlaceholder = rawText.match(/^\[(image|video|audio|voice|document|sticker)\]$/i);
+  if (mediaPlaceholder?.[1]) {
+    const label = mediaPlaceholder[1].toLowerCase() === "voice" ? "Voice message" : mediaPlaceholder[1];
+    return label.charAt(0).toUpperCase() + label.slice(1);
+  }
 
   return text;
 }
