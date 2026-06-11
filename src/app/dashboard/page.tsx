@@ -1,23 +1,9 @@
 "use client";
 
+import Icon from "@/components/ui/Icon";
 import { useEffect, useMemo, useRef, useState } from "react";
 import Image from "next/image";
-import {
-  FiArrowDownLeft,
-  FiArrowRight,
-  FiArrowUpRight,
-  FiBarChart2,
-  FiCopy,
-  FiEdit2,
-  FiImage,
-  FiInfo,
-  FiRefreshCw,
-  FiSend,
-  FiUsers,
-  FiZap,
-} from "react-icons/fi";
-import Icon from "@/components/ui/Icon";
-import { Button } from "@/components/Common/Button";
+import { Button } from "@/components/shared/Button";
 import PhoneProfileModal from "@/modals/ApiModal/PhoneProfileModal";
 import {
   getWhatsappCredential,
@@ -113,7 +99,7 @@ const InfoCard = ({
           iconPosition="right"
           className="group rounded-xl"
           icon={() => (
-            <FiArrowRight className="transition-transform group-hover:translate-x-1" />
+            <Icon name="fi:arrow-right" className="transition-transform group-hover:translate-x-1" />
           )}
         />
       </div>
@@ -142,7 +128,7 @@ const TrialBanner = () => (
   <div className="mb-6 flex flex-col items-center justify-between rounded-lg border-l-4 border-purple-700 bg-white p-4 shadow-sm md:flex-row">
     <div className="flex items-center gap-4">
       <div className="rounded-full bg-purple-50 p-2 text-purple-700">
-        <FiZap size={24} />
+        <Icon name="fi:zap" size={24} />
       </div>
       <div>
         <h3 className="text-lg font-bold text-purple-900">
@@ -154,7 +140,7 @@ const TrialBanner = () => (
       </div>
     </div>
     <button className="mt-4 flex items-center gap-2 rounded-md bg-purple-800 px-6 py-2.5 font-medium text-white shadow-md transition hover:bg-purple-900 md:mt-0">
-      <FiZap size={20} />
+      <Icon name="fi:zap" size={20} />
       Upgrade Now
     </button>
   </div>
@@ -165,7 +151,7 @@ const DashboardStats = () => (
     <div className="grid grid-cols-1 gap-4 rounded-xl border border-gray-200 bg-white p-6 text-left shadow-sm md:grid-cols-3">
       <div className="flex flex-col">
         <div className="mb-1 flex items-center gap-1 text-sm text-slate-900">
-          WhatsApp API Status <FiInfo className="text-slate-500" size={14} />
+          WhatsApp API Status <Icon name="fi:info" className="text-slate-500" size={14} />
         </div>
         <span className="w-fit rounded-full bg-green-600 px-3 py-1 text-xs font-bold text-white">
           ACTIVE
@@ -173,7 +159,7 @@ const DashboardStats = () => (
       </div>
       <div className="flex flex-col">
         <div className="mb-1 flex items-center gap-1 text-sm text-slate-600">
-          Quality Rating <FiInfo className="text-slate-500" size={14} />
+          Quality Rating <Icon name="fi:info" className="text-slate-500" size={14} />
         </div>
         <span className="w-fit rounded-full bg-green-500 px-3 py-1 text-xs font-bold text-white">
           GREEN
@@ -181,7 +167,7 @@ const DashboardStats = () => (
       </div>
       <div className="flex flex-col text-left">
         <div className="mb-1 flex items-center gap-1 text-sm text-slate-600">
-          Remaining Quota <FiInfo className="text-slate-500" size={14} />
+          Remaining Quota <Icon name="fi:info" className="text-slate-500" size={14} />
         </div>
         <span className="text-xl font-bold text-teal-600">1000</span>
       </div>
@@ -191,15 +177,14 @@ const DashboardStats = () => (
 
 const CountCards = () => {
   const stats = [
-    { title: "Total Contact", value: "248", icon: FiUsers, color: "from-blue-400 to-indigo-600" },
-    { title: "Total Agents", value: "8", icon: FiSend, color: "from-emerald-400 to-teal-600" },
-    { title: "Total Flow", value: "12", icon: FiBarChart2, color: "from-orange-400 to-red-500" },
+    { title: "Total Contact", value: "248", icon: "fi:users", color: "from-blue-400 to-indigo-600" },
+    { title: "Total Agents", value: "8", icon: "fi:send", color: "from-emerald-400 to-teal-600" },
+    { title: "Total Flow", value: "12", icon: "fi:bar-chart2", color: "from-orange-400 to-red-500" },
   ];
 
   return (
     <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-3">
       {stats.map((stat) => {
-        const IconItem = stat.icon;
         return (
           <div
             key={stat.title}
@@ -207,7 +192,7 @@ const CountCards = () => {
           >
             <div className={`absolute right-0 top-0 h-24 w-24 rounded-bl-[48px] bg-gradient-to-br ${stat.color} opacity-15`} />
             <div className={`mb-5 flex h-12 w-12 items-center justify-center rounded-xl bg-gradient-to-br ${stat.color} text-white shadow-sm`}>
-              <IconItem size={22} />
+              <Icon name={stat.icon} size={22} />
             </div>
             <p className="text-sm font-medium text-slate-500">{stat.title}</p>
             <p className="mt-2 text-3xl font-bold text-slate-900">{stat.value}</p>
@@ -235,7 +220,7 @@ const ProfileCard = ({ onOpen }: { onOpen: () => void }) => {
           onClick={onOpen}
           className="absolute right-4 top-4 rounded-full bg-gray-100 p-1.5 hover:text-gray-600"
         >
-          <FiEdit2 className="text-gray-400" size={20} />
+          <Icon name="fi:edit-2" className="text-gray-400" size={20} />
         </button>
 
         <div className="mb-4">
@@ -253,7 +238,7 @@ const ProfileCard = ({ onOpen }: { onOpen: () => void }) => {
             <div className="relative mt-1 flex items-center gap-1.5 text-[12px] text-gray-400">
               <span className="truncate">{websiteNumber}</span>
               <button onClick={handleCopy}>
-                <FiCopy className="text-gray-400" size={16} />
+                <Icon name="fi:copy" className="text-gray-400" size={16} />
               </button>
               {copied && (
                 <span className="absolute -top-5 right-0 rounded bg-black px-3 py-[3px] text-[10px] text-white">
@@ -263,7 +248,7 @@ const ProfileCard = ({ onOpen }: { onOpen: () => void }) => {
             </div>
           </div>
           <div className="flex h-10 w-10 items-center justify-center rounded-full bg-gray-100">
-            <FiImage className="text-gray-400" size={18} />
+            <Icon name="fi:image" className="text-gray-400" size={18} />
           </div>
         </div>
 
@@ -272,7 +257,7 @@ const ProfileCard = ({ onOpen }: { onOpen: () => void }) => {
           className="mt-4 flex items-center gap-2 text-[15px] font-semibold text-primary"
         >
           View Profile
-          <FiArrowDownLeft className="text-gray-400" size={20} />
+          <Icon name="fi:arrow-down-left" className="text-gray-400" size={20} />
         </button>
       </div>
     </div>
@@ -309,7 +294,7 @@ const ChartCard = ({
         </div>
         <div className="flex w-full items-center justify-between gap-2 sm:w-auto">
           <button className="rounded-full p-2 text-slate-500 transition hover:bg-gray-50">
-            <FiRefreshCw size={22} />
+            <Icon name="fi:refresh-cw" size={22} />
           </button>
           <button className="rounded-xl border border-slate-200 bg-white px-4 py-2 text-xs font-bold text-slate-600 shadow-sm">
             This Month
@@ -360,7 +345,7 @@ const ChartCard = ({
       {!stacked && (
         <div className="mt-auto flex items-center justify-between pt-6">
           <div className="flex items-center gap-2 text-slate-600">
-            <FiInfo size={16} />
+            <Icon name="fi:info" size={16} />
             <span className="text-[11px] font-bold uppercase tracking-wider">
               Stats Summary
             </span>
@@ -543,14 +528,14 @@ export default function DashboardPage() {
             <ChartCard
               title="Outgoing Traffic"
               tone="bg-blue-50 text-blue-600"
-              icon={<FiArrowUpRight size={18} />}
+              icon={<Icon name="fi:arrow-up-right" size={18} />}
               data={outgoingData}
               stacked
             />
             <ChartCard
               title="Incoming Traffic"
               tone="bg-emerald-50 text-emerald-600"
-              icon={<FiArrowDownLeft size={18} />}
+              icon={<Icon name="fi:arrow-down-left" size={18} />}
               data={incomingData}
             />
           </div>

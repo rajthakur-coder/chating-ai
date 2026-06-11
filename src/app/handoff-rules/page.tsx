@@ -1,13 +1,14 @@
 "use client";
 
+import Icon from "@/components/ui/Icon";
 import { FormEvent, useEffect, useMemo, useState } from "react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { FiSave } from "react-icons/fi";
 import { BotSettings, getBotSettings, updateBotSettings } from "@/services/botSettings";
 import { ToasterUtils } from "@/components/ui/toast";
-import { Button } from "@/components/Common/Button";
-import CustomInput from "@/components/Common/inputField";
-import ToggleButton from "@/components/Common/ToggleButton";
+import { Button } from "@/components/shared/Button";
+import CustomInput from "@/components/shared/inputField";
+import ToggleButton from "@/components/shared/ToggleButton";
+import Skeleton from "@/components/shared/Skeleton";
 
 type RuleGroup = {
   id: string;
@@ -146,7 +147,7 @@ export default function HandoffRulesPage() {
   };
 
   return (
-    <div className="mx-auto max-w-6xl space-y-6">
+    <div className="mx-auto max-w-7xl space-y-6">
       <section className="border-b border-default pb-4">
         <div className="flex flex-col gap-2 md:flex-row md:items-end md:justify-between">
           <div>
@@ -164,6 +165,14 @@ export default function HandoffRulesPage() {
         </div>
       </section>
 
+      {settingsQuery.isLoading ? (
+        <div className="space-y-6">
+          <Skeleton type="card" rows={2} cardPerRow={2} cardHeight={145} />
+          <Skeleton type="card" rows={1} cardPerRow={1} cardHeight={170} />
+        </div>
+      ) : null}
+
+      {!settingsQuery.isLoading ? (
       <form onSubmit={handleSubmit} className="space-y-6">
         <section className="grid gap-4 lg:grid-cols-2">
           {ruleGroups.map((group) => (
@@ -227,7 +236,7 @@ export default function HandoffRulesPage() {
           <Button
             type="submit"
             text={saveMutation.isPending ? "Saving..." : "Save Handoff Rules"}
-            icon={FiSave}
+            icon="fi:save"
             loading={saveMutation.isPending}
             loaderType="bounce"
             disabled={saveMutation.isPending || settingsQuery.isLoading}
@@ -235,6 +244,7 @@ export default function HandoffRulesPage() {
           />
         </div>
       </form>
+      ) : null}
     </div>
   );
 }

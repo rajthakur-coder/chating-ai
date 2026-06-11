@@ -1,7 +1,7 @@
 "use client";
 
 import React from "react";
-import { RadioButton } from "@/components/Common";
+import { RadioButton } from "@/components/shared";
 
 interface LogoutContentModalProps {
   title: string;

@@ -198,6 +198,55 @@ body {
   background-color: var(--surface-strong);
 }
 
+/* Dark-mode fallbacks for older neutral Tailwind classes.
+   New UI should prefer the semantic utilities above. */
+html.dark .bg-white {
+  background-color: var(--surface);
+}
+html.dark .bg-gray-50,
+html.dark .bg-slate-50 {
+  background-color: var(--background);
+}
+html.dark .bg-gray-100,
+html.dark .bg-slate-100,
+html.dark .bg-gray-200,
+html.dark .bg-slate-200 {
+  background-color: var(--surface-strong);
+}
+html.dark .text-black,
+html.dark .text-gray-900,
+html.dark .text-slate-900,
+html.dark .text-gray-800,
+html.dark .text-slate-800,
+html.dark .text-gray-700,
+html.dark .text-slate-700 {
+  color: var(--foreground);
+}
+html.dark .text-gray-600,
+html.dark .text-slate-600,
+html.dark .text-gray-500,
+html.dark .text-slate-500,
+html.dark .text-gray-400,
+html.dark .text-slate-400 {
+  color: var(--muted);
+}
+html.dark .border-gray-100,
+html.dark .border-slate-100,
+html.dark .border-gray-200,
+html.dark .border-slate-200,
+html.dark .border-gray-300,
+html.dark .border-slate-300 {
+  border-color: var(--border);
+}
+html.dark .hover\:bg-gray-50:hover,
+html.dark .hover\:bg-slate-50:hover,
+html.dark .hover\:bg-gray-100:hover,
+html.dark .hover\:bg-slate-100:hover,
+html.dark .hover\:bg-gray-200:hover,
+html.dark .hover\:bg-slate-200:hover {
+  background-color: var(--surface-hover);
+}
+
 .loader,
 .loaderformessageArea {
   width: 38px;

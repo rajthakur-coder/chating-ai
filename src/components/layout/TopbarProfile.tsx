@@ -1,10 +1,10 @@
 "use client";
 
+import Icon from "@/components/ui/Icon";
 import { useEffect, useState } from "react";
 import { createPortal } from "react-dom";
 import { useRouter } from "next/navigation";
 import { useQueryClient } from "@tanstack/react-query";
-import { FiX } from "react-icons/fi";
 import LogoutModal from "@/modals/ApiModal/LogoutModal";
 import { signOut } from "@/services/auth";
 
@@ -118,7 +118,7 @@ const TopbarProfile = ({ isOpen, onToggle, onClose }: TopbarProfileProps) => {
                 onClick={onClose}
                 className="absolute right-4 top-4 flex h-10 w-10 items-center justify-center rounded-full hover:bg-gray-100"
               >
-                <FiX size={22} />
+                <Icon name="fi:x" size={22} />
               </button>
 
               <div className="flex flex-col items-center bg-gray-50/50 pb-8 pt-16">

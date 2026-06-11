@@ -5,7 +5,8 @@ import api from "@/lib/api";
 import { getBotSettings, updateBotSettings } from "@/services/botSettings";
 import { getRuntimeConfig } from "@/services/runtime";
 import { ToasterUtils } from "@/components/ui/toast";
-import ToggleButton from "@/components/Common/ToggleButton";
+import ToggleButton from "@/components/shared/ToggleButton";
+import Skeleton from "@/components/shared/Skeleton";
 
 type EcommerceConnection = {
   id: number;
@@ -118,32 +119,37 @@ export default function WhatsAppBotPage() {
       </section>
 
       <section className="grid gap-4 md:grid-cols-2">
-        <div className="rounded-lg border border-default bg-surface p-4">
-          <p className="text-sm text-muted">Auto Reply</p>
-          <div className="mt-3 flex items-center justify-between gap-3">
-            <StatusPill active={Boolean(botSettings?.bot_enabled)} />
-            <ToggleButton
-              isOn={Boolean(botSettings?.bot_enabled)}
-              size="sm"
-              onToggle={() => {
-                if (!botSettings) return;
-                botMutation.mutate({
-                  ...botSettings,
-                  bot_enabled: !botSettings.bot_enabled,
-                });
-              }}
-            />
-          </div>
-        </div>
+        {botSettingsQuery.isLoading ? (
+          <Skeleton type="card" rows={1} cardPerRow={2} cardHeight={56} />
+        ) : (
+          <>
+            <div className="rounded-lg border border-default bg-surface p-4">
+              <p className="text-sm text-muted">Auto Reply</p>
+              <div className="mt-3 flex items-center justify-between gap-3">
+                <StatusPill active={Boolean(botSettings?.bot_enabled)} />
+                <ToggleButton
+                  isOn={Boolean(botSettings?.bot_enabled)}
+                  size="sm"
+                  onToggle={() => {
+                    if (!botSettings) return;
+                    botMutation.mutate({
+                      ...botSettings,
+                      bot_enabled: !botSettings.bot_enabled,
+                    });
+                  }}
+                />
+              </div>
+            </div>
 
-        <div className="rounded-lg border border-default bg-surface p-4">
-          <p className="text-sm text-muted">Store Bots</p>
-          <p className="mt-3 text-2xl font-semibold text-foreground">
-            {runningStores}/{connections.length}
-          </p>
-          <p className="mt-1 text-xs text-muted">stores running</p>
-        </div>
-
+            <div className="rounded-lg border border-default bg-surface p-4">
+              <p className="text-sm text-muted">Store Bots</p>
+              <p className="mt-3 text-2xl font-semibold text-foreground">
+                {runningStores}/{connections.length}
+              </p>
+              <p className="mt-1 text-xs text-muted">stores running</p>
+            </div>
+          </>
+        )}
       </section>
 
       <section className="rounded-lg border border-default bg-surface p-5">
@@ -160,23 +166,29 @@ export default function WhatsAppBotPage() {
             Refresh
           </button>
         </div>
-        <div className="mt-4 grid gap-3 md:grid-cols-2">
-          <div className="rounded-md border border-default bg-white p-3 dark:bg-slate-950">
-            <p className="text-xs font-semibold uppercase text-muted">Shopify Webhook Automation</p>
-            <div className="mt-2">
-              <StatusPill
-                active={Boolean(runtimeQuery.data?.shopify_webhook_automation_enabled)}
-                inactiveText="Disabled"
-              />
+        {runtimeQuery.isLoading ? (
+          <div className="mt-4">
+            <Skeleton type="card" rows={1} cardPerRow={2} cardHeight={48} />
+          </div>
+        ) : (
+          <div className="mt-4 grid gap-3 md:grid-cols-2">
+            <div className="rounded-md border border-default bg-white p-3 dark:bg-slate-950">
+              <p className="text-xs font-semibold uppercase text-muted">Shopify Webhook Automation</p>
+              <div className="mt-2">
+                <StatusPill
+                  active={Boolean(runtimeQuery.data?.shopify_webhook_automation_enabled)}
+                  inactiveText="Disabled"
+                />
+              </div>
+            </div>
+            <div className="rounded-md border border-default bg-white p-3 dark:bg-slate-950">
+              <p className="text-xs font-semibold uppercase text-muted">Automation Processor</p>
+              <div className="mt-2">
+                <StatusPill active={Boolean(runtimeQuery.data?.automation_processor_enabled)} />
+              </div>
             </div>
           </div>
-          <div className="rounded-md border border-default bg-white p-3 dark:bg-slate-950">
-            <p className="text-xs font-semibold uppercase text-muted">Automation Processor</p>
-            <div className="mt-2">
-              <StatusPill active={Boolean(runtimeQuery.data?.automation_processor_enabled)} />
-            </div>
-          </div>
-        </div>
+        )}
       </section>
 
       <section className="rounded-lg border border-default bg-surface p-5">
@@ -186,7 +198,9 @@ export default function WhatsAppBotPage() {
         />
         <div className="mt-4 divide-y divide-default rounded-md border border-default">
           {connectionsQuery.isLoading ? (
-            <p className="px-4 py-8 text-center text-sm text-muted">Loading stores...</p>
+            <div className="p-4">
+              <Skeleton type="text" rows={4} height={18} />
+            </div>
           ) : null}
           {!connectionsQuery.isLoading && connections.length === 0 ? (
             <p className="px-4 py-8 text-center text-sm text-muted">No ecommerce stores connected.</p>

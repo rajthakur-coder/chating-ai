@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import BaseModal from "../BaseModals/BaseModal";
-import CustomInput from "@/components/Common/inputField";
+import CustomInput from "@/components/shared/inputField";
 import { ToasterUtils } from "@/components/ui/toast";
 
 interface WhatsAppDisplayNameModalProps {

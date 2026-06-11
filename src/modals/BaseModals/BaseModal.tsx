@@ -1,9 +1,9 @@
 "use client";
 
+import Icon from "@/components/ui/Icon";
 import React, { useEffect, useState, type ReactNode } from "react";
 import ReactDOM from "react-dom";
 import clsx from "clsx";
-import { FiX } from "react-icons/fi";
 
 interface ExtraButtonProps {
   text: string;
@@ -46,8 +46,8 @@ const BaseModal = ({
   onCancel,
   confirmText = "Confirm",
   cancelText = "Cancel",
-  confirmColor = "bg-black hover:bg-gray-900 text-background",
-  cancelColor = "bg-gray-200 hover:bg-gray-100 text-black",
+  confirmColor = "bg-dark hover:bg-primary-strong text-background",
+  cancelColor = "bg-surface-strong hover:bg-surface-hover text-foreground",
   widthClass = "max-w-[95%] sm:w-[90%] md:w-[600px]",
   minHeight = "min-h-auto",
   maxHeight = "max-h-[70vh]",
@@ -100,7 +100,7 @@ const BaseModal = ({
       <div
         onClick={(event) => event.stopPropagation()}
         className={clsx(
-          "flex max-h-[92vh] flex-col overflow-hidden rounded-2xl bg-white text-gray-800 shadow-2xl transition-all duration-150",
+          "flex max-h-[92vh] flex-col overflow-hidden rounded-2xl border border-default bg-white text-foreground shadow-2xl transition-all duration-150 dark:bg-slate-950",
           widthClass,
           shake && "animate-[modal-shake_0.5s_ease-in-out]",
         )}
@@ -121,10 +121,10 @@ const BaseModal = ({
             {showCloseIcon && (
               <button
                 onClick={toggle}
-                className="rounded-full p-2 transition-colors hover:bg-gray-100"
+                className="rounded-full p-2 transition-colors hover:bg-surface-strong"
                 disabled={isLoading}
               >
-                <FiX className="h-5 w-5 text-gray-500" />
+                <Icon name="fi:x" className="h-5 w-5 text-muted" />
               </button>
             )}
           </div>
@@ -145,7 +145,7 @@ const BaseModal = ({
         {(onCancel || onConfirm || extraButton) && (
           <div
             className={clsx(
-              "flex flex-shrink-0 justify-end gap-3 bg-white p-4 md:px-8",
+              "flex flex-shrink-0 justify-end gap-3 bg-white p-4 md:px-8 dark:bg-slate-950",
               showFooterBorder && "border-t border-bordercolor",
             )}
           >
@@ -168,7 +168,7 @@ const BaseModal = ({
                 disabled={extraButton.disabled || isLoading}
                 className={clsx(
                   "rounded-lg border-2 px-4 py-2 text-sm font-medium transition-all duration-200 active:scale-95",
-                  extraButton.colorClass || "bg-gray-300 hover:bg-gray-200",
+                  extraButton.colorClass || "bg-surface-strong hover:bg-surface-hover text-foreground",
                 )}
               >
                 {extraButton.text}

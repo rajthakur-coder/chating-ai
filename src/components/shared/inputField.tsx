@@ -1,7 +1,7 @@
 "use client";
 
+import Icon from "@/components/ui/Icon";
 import React, { forwardRef, useEffect, useState } from "react";
-import { FiEye, FiEyeOff, FiX } from "react-icons/fi";
 
 interface CustomInputProps {
   label?: string;
@@ -71,14 +71,14 @@ const CustomInput = forwardRef<HTMLDivElement, CustomInputProps>(
 
     const inputBaseClasses = `
       w-full outline-none transition-all duration-300 ease-in-out
-      border rounded-[5px] text-[#0d0c22] placeholder:text-[#94a3b8]
+      border rounded-[5px] text-foreground placeholder:text-muted
       appearance-none
       ${multiline ? "py-2" : "leading-[30px]"}
-      ${disabled ? "bg-gray-100 cursor-not-allowed opacity-60" : "bg-white"}
+      ${disabled ? "bg-surface-strong cursor-not-allowed opacity-60" : "bg-white dark:bg-slate-950"}
       ${
         error
           ? "border-red-500 focus:border-red-500 focus:ring-[3px] focus:ring-red-500/20"
-          : "border-gray-300 hover:border-[#818cf8] focus:border-[#818cf8] focus:ring-[3px] focus:ring-[#818cf8]/30"
+          : "border-default hover:border-[#818cf8] focus:border-[#818cf8] focus:ring-[3px] focus:ring-[#818cf8]/30"
       }
       ${countryCode ? "pl-[3.5rem]" : "pl-3"}
       ${type === "password" ? "pr-[3rem]" : onClear && localValue ? "pr-[2.5rem]" : "pr-3"}
@@ -87,15 +87,15 @@ const CustomInput = forwardRef<HTMLDivElement, CustomInputProps>(
     return (
       <div className={`flex w-full flex-col gap-1 ${className}`} ref={ref}>
         {label && (
-          <label className="mb-0.5 flex items-center gap-1 text-sm font-medium text-gray-800">
+          <label className="mb-0.5 flex items-center gap-1 text-sm font-medium text-foreground">
             <span>{label}</span>
-            {optional && <span className="ml-1 font-normal text-gray-400">Optional</span>}
+            {optional && <span className="ml-1 font-normal text-muted">Optional</span>}
           </label>
         )}
 
         <div className="relative flex w-full items-center">
           {countryCode && (
-            <span className="pointer-events-none absolute left-3 z-10 text-sm font-medium text-gray-500">
+            <span className="pointer-events-none absolute left-3 z-10 text-sm font-medium text-muted">
               {countryCode}
             </span>
           )}
@@ -137,9 +137,9 @@ const CustomInput = forwardRef<HTMLDivElement, CustomInputProps>(
                   setLocalValue("");
                   onClear();
                 }}
-                className="z-20 rounded-full p-0.5 text-gray-400 transition-colors hover:bg-gray-200 hover:text-gray-600"
+                className="z-20 rounded-full p-0.5 text-muted transition-colors hover:bg-surface-strong hover:text-foreground"
               >
-                <FiX size={18} />
+                <Icon name="fi:x" size={18} />
               </button>
             )}
 
@@ -148,16 +148,16 @@ const CustomInput = forwardRef<HTMLDivElement, CustomInputProps>(
                 type="button"
                 onClick={() => setShowPassword((prev) => !prev)}
                 disabled={disabled}
-                className="z-20 text-[#64748b] transition-colors hover:text-[#818cf8]"
+                className="z-20 text-muted transition-colors hover:text-primary"
               >
-                {showPassword ? <FiEye size={18} /> : <FiEyeOff size={18} />}
+                {showPassword ? <Icon name="fi:eye" size={18} /> : <Icon name="fi:eye-off" size={18} />}
               </button>
             )}
           </div>
         </div>
 
         {helperText && (
-          <p className={`mt-0.5 text-[12px] font-medium ${error ? "text-red-500" : "text-gray-500"}`}>
+          <p className={`mt-0.5 text-[12px] font-medium ${error ? "text-red-500" : "text-muted"}`}>
             {helperText}
           </p>
         )}

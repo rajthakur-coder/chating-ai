@@ -1,7 +1,7 @@
 "use client";
 
+import Icon from "@/components/ui/Icon";
 import { useEffect, useMemo, useState } from "react";
-import { FiAlertCircle, FiCheckCircle, FiInfo, FiLoader, FiX } from "react-icons/fi";
 import {
   APP_TOAST_DISMISS_EVENT,
   APP_TOAST_EVENT,
@@ -20,22 +20,22 @@ const toastStyles: Record<
   { icon: React.ReactNode; className: string; bar: string }
 > = {
   success: {
-    icon: <FiCheckCircle className="h-5 w-5" />,
+    icon: <Icon name="fi:check-circle" className="h-5 w-5" />,
     className: "border-emerald-200 bg-emerald-50 text-emerald-900",
     bar: "bg-emerald-500",
   },
   error: {
-    icon: <FiAlertCircle className="h-5 w-5" />,
+    icon: <Icon name="fi:alert-circle" className="h-5 w-5" />,
     className: "border-red-200 bg-red-50 text-red-900",
     bar: "bg-red-500",
   },
   info: {
-    icon: <FiInfo className="h-5 w-5" />,
+    icon: <Icon name="fi:info" className="h-5 w-5" />,
     className: "border-sky-200 bg-sky-50 text-sky-900",
     bar: "bg-sky-500",
   },
   loading: {
-    icon: <FiLoader className="h-5 w-5 animate-spin" />,
+    icon: <Icon name="fi:loader" className="h-5 w-5 animate-spin" />,
     className: "border-slate-200 bg-white text-slate-900",
     bar: "bg-slate-500",
   },
@@ -118,7 +118,7 @@ const AppToaster = () => {
               }
               className="rounded-full p-1 text-current opacity-70 transition hover:bg-black/5 hover:opacity-100"
             >
-              <FiX className="h-4 w-4" />
+              <Icon name="fi:x" className="h-4 w-4" />
             </button>
             <span className={`absolute inset-x-0 bottom-0 h-1 ${style.bar}`} />
           </div>

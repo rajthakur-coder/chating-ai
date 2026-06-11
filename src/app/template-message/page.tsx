@@ -1,9 +1,9 @@
 "use client";
 
+import Icon from "@/components/ui/Icon";
 import { useEffect, useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { FiRefreshCw, FiTrash2, FiZap } from "react-icons/fi";
 import {
   Button,
   ButtonDropdown,
@@ -12,7 +12,7 @@ import {
   SearchInput,
   Skeleton,
   StatusBadge,
-} from "@/components/Common";
+} from "@/components/shared";
 import {
   TemplateStatus,
   deleteWhatsappTemplate,
@@ -21,6 +21,7 @@ import {
   getWhatsappTemplates,
   syncWhatsappTemplates,
 } from "@/services/templates";
+import { useDebouncedValue } from "@/hooks/useDebouncedValue";
 import { runWithToast } from "@/utils/runWithToast";
 
 const categoryOptions = [
@@ -78,17 +79,18 @@ export default function TemplateMessagePage() {
   const [language, setLanguage] = useState("");
   const [selectedIds, setSelectedIds] = useState<number[]>([]);
   const [currentPage, setCurrentPage] = useState(1);
+  const debouncedSearch = useDebouncedValue(search.trim(), 300);
 
   useEffect(() => {
     setCurrentPage(1);
     setSelectedIds([]);
-  }, [search, status, category, language]);
+  }, [debouncedSearch, status, category, language]);
 
   const templatesQuery = useQuery({
-    queryKey: ["whatsapp-templates", currentPage, search, status, category, language],
+    queryKey: ["whatsapp-templates", currentPage, debouncedSearch, status, category, language],
     queryFn: () =>
       getWhatsappTemplates({
-        name: search,
+        name: debouncedSearch,
         status,
         category,
         language,
@@ -172,7 +174,7 @@ export default function TemplateMessagePage() {
             disabled={syncMutation.isPending}
             className="flex h-9 w-9 items-center justify-center rounded-md bg-gray-200 transition hover:bg-gray-100"
           >
-            <FiRefreshCw
+            <Icon name="fi:refresh-cw"
               className={syncMutation.isPending ? "animate-spin text-primary" : "text-foreground"}
               size={18}
             />
@@ -197,7 +199,7 @@ export default function TemplateMessagePage() {
           }}
         >
           <div className="flex items-start gap-4 sm:items-center">
-            <FiZap className="mt-1 h-7 w-7 text-primary sm:mt-0" />
+            <Icon name="fi:zap" className="mt-1 h-7 w-7 text-primary sm:mt-0" />
             <div>
               <h3 className="text-base font-semibold text-foreground sm:text-lg">
                 Introducing AI-powered Magic: Generate Powerful WhatsApp Templates in seconds!
@@ -207,7 +209,7 @@ export default function TemplateMessagePage() {
           </div>
           <Button
             text="Generate Now"
-            icon={FiZap}
+            icon="fi:zap"
             iconPosition="left"
             color="light"
             variant="ghost"
@@ -278,7 +280,7 @@ export default function TemplateMessagePage() {
               variant="solid"
               size="sm"
               onClick={handleDelete}
-              icon={FiTrash2}
+              icon="fi:trash2"
               className="font-bold shadow-sm active:scale-95"
             />
           </div>
@@ -372,7 +374,7 @@ export default function TemplateMessagePage() {
                                 }}
                                 className="rounded-full p-1 hover:bg-gray-100"
                               >
-                                <FiRefreshCw size={14} />
+                                <Icon name="fi:refresh-cw" size={14} />
                               </button>
                             ) : null}
                           </div>

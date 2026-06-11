@@ -1,21 +1,11 @@
 "use client";
 
+import Icon from "@/components/ui/Icon";
 import { useMemo, useState } from "react";
 import { useQuery } from "@tanstack/react-query";
-import {
-  FiBarChart2,
-  FiCheckCircle,
-  FiDollarSign,
-  FiExternalLink,
-  FiList,
-  FiMousePointer,
-  FiRefreshCw,
-  FiShoppingBag,
-  FiTrendingUp,
-  FiUsers,
-} from "react-icons/fi";
-import Pagination from "@/components/Common/Pagination";
-import { getCommerceDashboard } from "@/services/aiAgentApis";
+import Pagination from "@/components/shared/Pagination";
+import Skeleton from "@/components/shared/Skeleton";
+import { getCommerceDashboard } from "@/services/commerceDashboard";
 import {
   AnalyticsGroup,
   WhatsappAnalyticsEvent,
@@ -157,7 +147,7 @@ function HealthStrip({
                 : "bg-amber-100 text-amber-700 dark:bg-amber-950/50 dark:text-amber-200"
             }`}
           >
-            <FiCheckCircle size={13} />
+            <Icon name="fi:check-circle" size={13} />
             {check.ok ? "Live" : "Waiting"}
           </span>
         </div>
@@ -318,7 +308,7 @@ export default function WhatsappAnalyticsPage() {
               disabled={summaryQuery.isFetching || eventsQuery.isFetching}
               className="inline-flex items-center gap-2 rounded-md border border-default bg-surface px-4 py-2.5 text-sm font-semibold text-foreground transition hover:bg-surface-strong disabled:opacity-60"
             >
-              <FiRefreshCw size={16} />
+              <Icon name="fi:refresh-cw" size={16} />
               Refresh
             </button>
           </div>
@@ -326,84 +316,113 @@ export default function WhatsappAnalyticsPage() {
       </section>
 
       <section className="grid gap-4 md:grid-cols-2 xl:grid-cols-4">
-        <StatCard
-          label="Total interactions"
-          value={totalInteractions}
-          icon={<FiBarChart2 size={20} />}
-          detail={`Last ${days} days`}
-        />
-        <StatCard
-          label="Button clicks"
-          value={eventCounts.button_click || 0}
-          icon={<FiMousePointer size={20} />}
-          detail="Reply button taps"
-          accent="text-emerald-600"
-        />
-        <StatCard
-          label="List selections"
-          value={eventCounts.list_click || 0}
-          icon={<FiList size={20} />}
-          detail="Catalog and menu list picks"
-          accent="text-violet-600"
-        />
-        <StatCard
-          label="Link clicks"
-          value={linkClicks}
-          icon={<FiExternalLink size={20} />}
-          detail="Tracked product URL opens"
-          accent="text-blue-600"
-        />
+        {summaryQuery.isLoading ? (
+          <div className="md:col-span-2 xl:col-span-4">
+            <Skeleton type="card" rows={1} cardPerRow={4} cardHeight={76} />
+          </div>
+        ) : (
+          <>
+            <StatCard
+              label="Total interactions"
+              value={totalInteractions}
+              icon={<Icon name="fi:bar-chart2" size={20} />}
+              detail={`Last ${days} days`}
+            />
+            <StatCard
+              label="Button clicks"
+              value={eventCounts.button_click || 0}
+              icon={<Icon name="fi:mouse-pointer" size={20} />}
+              detail="Reply button taps"
+              accent="text-emerald-600"
+            />
+            <StatCard
+              label="List selections"
+              value={eventCounts.list_click || 0}
+              icon={<Icon name="fi:list" size={20} />}
+              detail="Catalog and menu list picks"
+              accent="text-violet-600"
+            />
+            <StatCard
+              label="Link clicks"
+              value={linkClicks}
+              icon={<Icon name="fi:external-link" size={20} />}
+              detail="Tracked product URL opens"
+              accent="text-blue-600"
+            />
+          </>
+        )}
       </section>
 
       <section className="grid gap-4 md:grid-cols-2 xl:grid-cols-4">
-        <StatCard
-          label="Commerce revenue"
-          value={formatMetric(revenue)}
-          icon={<FiDollarSign size={20} />}
-          detail={commerceQuery.isLoading ? "Loading store dashboard" : "From commerce dashboard API"}
-          accent="text-emerald-600"
-        />
-        <StatCard
-          label="Orders"
-          value={formatMetric(orders)}
-          icon={<FiShoppingBag size={20} />}
-          detail="Orders in selected reporting window"
-          accent="text-amber-600"
-        />
-        <StatCard
-          label="Recovered carts"
-          value={formatMetric(recovered)}
-          icon={<FiRefreshCw size={20} />}
-          detail="Recovered or attributed cart activity"
-          accent="text-violet-600"
-        />
-        <StatCard
-          label="Avg interactions/contact"
-          value={engagementRate}
-          icon={<FiTrendingUp size={20} />}
-          detail={`${activeContacts.toLocaleString()} active contacts`}
-          accent="text-blue-600"
-        />
+        {commerceQuery.isLoading ? (
+          <div className="md:col-span-2 xl:col-span-4">
+            <Skeleton type="card" rows={1} cardPerRow={4} cardHeight={76} />
+          </div>
+        ) : (
+          <>
+            <StatCard
+              label="Commerce revenue"
+              value={formatMetric(revenue)}
+              icon={<Icon name="fi:dollar-sign" size={20} />}
+              detail="From commerce dashboard API"
+              accent="text-emerald-600"
+            />
+            <StatCard
+              label="Orders"
+              value={formatMetric(orders)}
+              icon={<Icon name="fi:shopping-bag" size={20} />}
+              detail="Orders in selected reporting window"
+              accent="text-amber-600"
+            />
+            <StatCard
+              label="Recovered carts"
+              value={formatMetric(recovered)}
+              icon={<Icon name="fi:refresh-cw" size={20} />}
+              detail="Recovered or attributed cart activity"
+              accent="text-violet-600"
+            />
+            <StatCard
+              label="Avg interactions/contact"
+              value={engagementRate}
+              icon={<Icon name="fi:trending-up" size={20} />}
+              detail={`${activeContacts.toLocaleString()} active contacts`}
+              accent="text-blue-600"
+            />
+          </>
+        )}
       </section>
 
-      <HealthStrip
-        total={totalInteractions}
-        contacts={activeContacts}
-        links={linkClicks}
-        orders={orders}
-      />
+      {summaryQuery.isLoading || commerceQuery.isLoading ? (
+        <Skeleton type="card" rows={1} cardPerRow={4} cardHeight={44} />
+      ) : (
+        <HealthStrip
+          total={totalInteractions}
+          contacts={activeContacts}
+          links={linkClicks}
+          orders={orders}
+        />
+      )}
 
       <section className="grid gap-4 xl:grid-cols-[1.15fr_0.85fr]">
-        <BarList
-          title="Top Buttons And Links"
-          items={summaryQuery.data?.by_button_or_link || []}
-          emptyText={summaryQuery.isLoading ? "Loading analytics..." : "No clicks found yet."}
-        />
-        <BarList
-          title="Most Active Contacts"
-          items={summaryQuery.data?.by_phone || []}
-          emptyText={summaryQuery.isLoading ? "Loading contacts..." : "No contact activity yet."}
-        />
+        {summaryQuery.isLoading ? (
+          <>
+            <Skeleton type="card" rows={1} cardPerRow={1} cardHeight={230} />
+            <Skeleton type="card" rows={1} cardPerRow={1} cardHeight={230} />
+          </>
+        ) : (
+          <>
+            <BarList
+              title="Top Buttons And Links"
+              items={summaryQuery.data?.by_button_or_link || []}
+              emptyText="No clicks found yet."
+            />
+            <BarList
+              title="Most Active Contacts"
+              items={summaryQuery.data?.by_phone || []}
+              emptyText="No contact activity yet."
+            />
+          </>
+        )}
       </section>
 
       <section className="flex flex-col rounded-lg border border-default bg-surface">
@@ -426,7 +445,9 @@ export default function WhatsappAnalyticsPage() {
 
         <div>
           {eventsQuery.isLoading ? (
-            <p className="px-4 py-10 text-center text-sm text-muted">Loading events...</p>
+            <div className="p-4">
+              <Skeleton type="text" rows={8} height={20} />
+            </div>
           ) : null}
 
           {!eventsQuery.isLoading && (eventsQuery.data?.items || []).length === 0 ? (

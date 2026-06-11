@@ -1,19 +1,8 @@
 "use client";
 
+import Icon from "@/components/ui/Icon";
 import { FormEvent, useEffect, useState } from "react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import {
-  FiClock,
-  FiCpu,
-  FiMessageCircle,
-  FiPlay,
-  FiSave,
-  FiSettings,
-  FiShield,
-  FiShoppingBag,
-  FiUserCheck,
-  FiZap,
-} from "react-icons/fi";
 import {
   BotSettings,
   CommerceFlowSettings,
@@ -27,10 +16,11 @@ import {
   updateTenantCommerceFlowSettings,
 } from "@/services/botSettings";
 import { ToasterUtils } from "@/components/ui/toast";
-import { Button } from "@/components/Common/Button";
-import CustomSelect from "@/components/Common/CustomSelect";
-import CustomInput from "@/components/Common/inputField";
-import ToggleButton from "@/components/Common/ToggleButton";
+import { Button } from "@/components/shared/Button";
+import CustomSelect from "@/components/shared/CustomSelect";
+import CustomInput from "@/components/shared/inputField";
+import ToggleButton from "@/components/shared/ToggleButton";
+import Skeleton from "@/components/shared/Skeleton";
 
 const defaultSettings: BotSettings = {
   bot_enabled: true,
@@ -172,30 +162,30 @@ const commerceTextFields: Array<{
 
 type SettingsTab = "reply" | "handoff" | "commerce" | "advanced";
 
-const settingsTabs: Array<{ key: SettingsTab; label: string; description: string; icon: typeof FiMessageCircle }> = [
+const settingsTabs: Array<{ key: SettingsTab; label: string; description: string; icon: string }> = [
   {
     key: "reply",
     label: "AI Reply",
     description: "Voice, model, prompt and preview.",
-    icon: FiMessageCircle,
+    icon: "fi:message-circle",
   },
   {
     key: "handoff",
     label: "Handoff",
     description: "Human routing and business hours.",
-    icon: FiUserCheck,
+    icon: "fi:user-check",
   },
   {
     key: "commerce",
     label: "Commerce",
     description: "Store flows customers actually use.",
-    icon: FiShoppingBag,
+    icon: "fi:shopping-bag",
   },
   {
     key: "advanced",
     label: "Advanced",
     description: "Provider fallback and system prompt.",
-    icon: FiSettings,
+    icon: "fi:settings",
   },
 ];
 
@@ -360,7 +350,7 @@ export default function BotSettingsPage() {
             type="submit"
             form="bot-settings-form"
             text={saveMutation.isPending ? "Saving..." : "Save Changes"}
-            icon={FiSave}
+            icon="fi:save"
             loading={saveMutation.isPending}
             loaderType="bounce"
             disabled={saveMutation.isPending || settingsQuery.isLoading}
@@ -369,6 +359,18 @@ export default function BotSettingsPage() {
         </div>
       </section>
 
+      {settingsQuery.isLoading || tenantConfigQuery.isLoading ? (
+        <div className="space-y-6">
+          <Skeleton type="tabs" columns={4} />
+          <section className="grid gap-4 lg:grid-cols-[minmax(0,1.3fr)_minmax(320px,0.7fr)]">
+            <Skeleton type="card" rows={1} cardPerRow={1} cardHeight={360} />
+            <Skeleton type="card" rows={1} cardPerRow={1} cardHeight={360} />
+          </section>
+          <Skeleton type="card" rows={1} cardPerRow={1} cardHeight={220} />
+        </div>
+      ) : null}
+
+      {!settingsQuery.isLoading && !tenantConfigQuery.isLoading ? (
       <form id="bot-settings-form" onSubmit={handleSubmit} className="space-y-6">
         <section className="grid gap-4 lg:grid-cols-[minmax(0,1.3fr)_minmax(320px,0.7fr)]">
           <div className="rounded-lg border border-default bg-surface p-5 shadow-sm">
@@ -395,16 +397,16 @@ export default function BotSettingsPage() {
             </div>
 
             <div className="mt-5 grid gap-3 md:grid-cols-3">
-              <ControlStat icon={FiMessageCircle} label="Reply mode" value={form.ai_tone || "friendly"} />
-              <ControlStat icon={FiCpu} label="Model" value={llmForm.model || "Not set"} />
-              <ControlStat icon={FiShield} label="Handoff" value={`${form.handoff_keywords.length} keywords`} />
+              <ControlStat icon="fi:message-circle" label="Reply mode" value={form.ai_tone || "friendly"} />
+              <ControlStat icon="fi:cpu" label="Model" value={llmForm.model || "Not set"} />
+              <ControlStat icon="fi:shield" label="Handoff" value={`${form.handoff_keywords.length} keywords`} />
             </div>
           </div>
 
           <div className="rounded-lg border border-default bg-surface p-5 shadow-sm">
             <div className="flex items-center gap-3">
               <div className="flex h-10 w-10 items-center justify-center rounded-md bg-primary/10 text-primary">
-                <FiZap className="h-5 w-5" />
+                <Icon name="fi:zap" className="h-5 w-5" />
               </div>
               <div>
                 <h2 className="text-base font-semibold text-foreground">Production Checklist</h2>
@@ -438,7 +440,7 @@ export default function BotSettingsPage() {
             {activeTab === "reply" ? (
               <div className="space-y-6">
                 <SectionIntro
-                  icon={FiMessageCircle}
+                  icon="fi:message-circle"
                   title="AI Reply"
                   description="Set the bot voice, everyday replies, and test how it answers before saving."
                 />
@@ -536,7 +538,7 @@ export default function BotSettingsPage() {
             {activeTab === "handoff" ? (
               <div className="space-y-6">
                 <SectionIntro
-                  icon={FiUserCheck}
+                  icon="fi:user-check"
                   title="Handoff"
                   description="Control when the AI pauses and how customers are routed to the team."
                 />
@@ -575,7 +577,7 @@ export default function BotSettingsPage() {
                   <div className="flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
                     <div>
                       <div className="flex items-center gap-2">
-                        <FiClock className="h-4 w-4 text-primary" />
+                        <Icon name="fi:clock" className="h-4 w-4 text-primary" />
                         <h3 className="text-sm font-semibold text-foreground">Business Hours</h3>
                       </div>
                       <p className="mt-1 text-xs text-muted">Used for routing and offline replies.</p>
@@ -612,7 +614,7 @@ export default function BotSettingsPage() {
             {activeTab === "commerce" ? (
               <div className="space-y-6">
                 <SectionIntro
-                  icon={FiShoppingBag}
+                  icon="fi:shopping-bag"
                   title="Commerce"
                   description="Edit the high-impact store replies customers see during shopping, returns, and checkout."
                 />
@@ -674,7 +676,7 @@ export default function BotSettingsPage() {
             {activeTab === "advanced" ? (
               <div className="space-y-6">
                 <SectionIntro
-                  icon={FiSettings}
+                  icon="fi:settings"
                   title="Advanced"
                   description="Provider routing and full system prompt overrides for technical operators."
                 />
@@ -759,6 +761,7 @@ export default function BotSettingsPage() {
           </div>
         </section>
       </form>
+      ) : null}
     </div>
   );
 }
@@ -776,18 +779,18 @@ function StatusPill({ active }: { active: boolean }) {
 }
 
 function ControlStat({
-  icon: Icon,
+  icon,
   label,
   value,
 }: {
-  icon: typeof FiMessageCircle;
+  icon: string;
   label: string;
   value: string;
 }) {
   return (
     <div className="rounded-md border border-default bg-white px-3 py-3">
       <div className="flex items-center gap-2 text-xs font-medium uppercase text-muted">
-        <Icon className="h-3.5 w-3.5 text-primary" />
+        <Icon name={icon} className="h-3.5 w-3.5 text-primary" />
         {label}
       </div>
       <p className="mt-2 truncate text-sm font-semibold text-foreground">{value}</p>
@@ -811,13 +814,13 @@ function ChecklistItem({ done, label }: { done: boolean; label: string }) {
 function SettingsTabButton({
   active,
   description,
-  icon: Icon,
+  icon,
   label,
   onClick,
 }: {
   active: boolean;
   description: string;
-  icon: typeof FiMessageCircle;
+  icon: string;
   label: string;
   onClick: () => void;
 }) {
@@ -827,11 +830,11 @@ function SettingsTabButton({
       onClick={onClick}
       className={`w-full rounded-md border px-4 py-3 text-left transition ${
         active ? "border-primary bg-primary/5 shadow-sm" : "border-default bg-surface hover:bg-surface-hover"
-      }`}
+        }`}
     >
       <div className="flex items-start gap-3">
         <div className={`mt-0.5 rounded-md p-2 ${active ? "bg-primary text-white" : "bg-white text-primary"}`}>
-          <Icon className="h-4 w-4" />
+          <Icon name={icon} className="h-4 w-4" />
         </div>
         <div className="min-w-0">
           <p className="font-semibold text-foreground">{label}</p>
@@ -844,17 +847,17 @@ function SettingsTabButton({
 
 function SectionIntro({
   description,
-  icon: Icon,
+  icon,
   title,
 }: {
   description: string;
-  icon: typeof FiMessageCircle;
+  icon: string;
   title: string;
 }) {
   return (
     <div className="flex items-start gap-3 border-b border-default pb-4">
       <div className="rounded-md bg-primary/10 p-2 text-primary">
-        <Icon className="h-5 w-5" />
+        <Icon name={icon} className="h-5 w-5" />
       </div>
       <div>
         <h2 className="text-lg font-semibold text-foreground">{title}</h2>
@@ -891,7 +894,7 @@ function PreviewPanel({
         <Button
           type="button"
           text={previewMutationPending ? "Running..." : "Run Preview"}
-          icon={FiPlay}
+          icon="fi:play"
           loading={previewMutationPending}
           loaderType="bounce"
           disabled={previewMutationPending || !previewMessage.trim()}

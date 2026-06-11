@@ -1,5 +1,5 @@
+import Icon from "@/components/ui/Icon";
 import React, { useEffect, useRef, useState } from "react";
-import { FiChevronDown, FiX } from "react-icons/fi";
 
 export type SelectOption = {
   label: string;
@@ -50,9 +50,9 @@ const CustomSelect: React.FC<CustomSelectProps> = ({
   return (
     <div ref={ref} className={`relative flex w-full flex-col gap-1 ${className}`}>
       {label ? (
-        <label className="mb-0.5 flex items-center gap-1 text-sm font-medium text-gray-800">
+        <label className="mb-0.5 flex items-center gap-1 text-sm font-medium text-foreground">
           <span>{label}</span>
-          {optional ? <span className="ml-1 font-normal text-gray-400">Optional</span> : null}
+          {optional ? <span className="ml-1 font-normal text-muted">Optional</span> : null}
         </label>
       ) : null}
 
@@ -60,19 +60,19 @@ const CustomSelect: React.FC<CustomSelectProps> = ({
         type="button"
         disabled={disabled}
         onClick={() => setOpen((current) => !current)}
-        className={`flex h-[45px] w-full items-center justify-between gap-2 rounded-[5px] border bg-white px-3 text-left text-sm outline-none transition-all ${
+        className={`flex h-[45px] w-full items-center justify-between gap-2 rounded-[5px] border bg-white px-3 text-left text-sm outline-none transition-all dark:bg-slate-950 ${
           disabled
-            ? "cursor-not-allowed bg-gray-100 opacity-60"
+            ? "cursor-not-allowed bg-surface-strong opacity-60"
             : "cursor-pointer"
         } ${
           error
             ? "border-red-500 ring-[3px] ring-red-500/20"
             : open
               ? "border-[#818cf8] ring-[3px] ring-[#818cf8]/30"
-              : "border-gray-300 hover:border-[#818cf8]"
+              : "border-default hover:border-[#818cf8]"
         }`}
       >
-        <span className={`min-w-0 flex-1 truncate ${selectedOption ? "text-[#0d0c22]" : "text-[#94a3b8]"}`}>
+        <span className={`min-w-0 flex-1 truncate ${selectedOption ? "text-foreground" : "text-muted"}`}>
           {selectedOption?.label || placeholder}
         </span>
         <span className="flex shrink-0 items-center gap-1">
@@ -84,20 +84,20 @@ const CustomSelect: React.FC<CustomSelectProps> = ({
                 event.stopPropagation();
                 onChange("");
               }}
-              className="rounded-full p-0.5 text-gray-400 transition-colors hover:bg-gray-100 hover:text-red-500"
+              className="rounded-full p-0.5 text-muted transition-colors hover:bg-surface-strong hover:text-red-500"
             >
-              <FiX size={18} />
+              <Icon name="fi:x" size={18} />
             </span>
           ) : null}
-          <FiChevronDown
+          <Icon name="fi:chevron-down"
             size={18}
-            className={`text-[#64748b] transition-transform ${open ? "rotate-180" : ""}`}
+            className={`text-muted transition-transform ${open ? "rotate-180" : ""}`}
           />
         </span>
       </button>
 
       {open && !disabled ? (
-        <div className="absolute left-0 right-0 top-full z-[100] mt-1.5 overflow-hidden rounded-lg border border-gray-200 bg-white shadow-xl">
+        <div className="absolute left-0 right-0 top-full z-[100] mt-1.5 overflow-hidden rounded-lg border border-default bg-white shadow-xl dark:bg-slate-950">
           <div className="max-h-[250px] overflow-y-auto py-1">
             {options.map((option) => (
               <button
@@ -110,7 +110,7 @@ const CustomSelect: React.FC<CustomSelectProps> = ({
                 className={`block w-full px-4 py-2.5 text-left text-sm transition-colors ${
                   option.value === value
                     ? "bg-[#818cf8]/10 font-semibold text-[#818cf8]"
-                    : "text-gray-700 hover:bg-gray-50"
+                    : "text-foreground hover:bg-surface-hover"
                 }`}
               >
                 {option.label}
@@ -121,7 +121,7 @@ const CustomSelect: React.FC<CustomSelectProps> = ({
       ) : null}
 
       {helperText ? (
-        <p className={`mt-0.5 text-[12px] font-medium ${error ? "text-red-500" : "text-gray-500"}`}>
+        <p className={`mt-0.5 text-[12px] font-medium ${error ? "text-red-500" : "text-muted"}`}>
           {helperText}
         </p>
       ) : null}

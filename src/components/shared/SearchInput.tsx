@@ -1,6 +1,6 @@
+import Icon from "@/components/ui/Icon";
 import React from "react";
 import clsx from "clsx";
-import { FiSearch } from "react-icons/fi";
 
 interface SearchInputProps {
   value: string;
@@ -10,8 +10,10 @@ interface SearchInputProps {
   height?: string;
   className?: string;
   onBlur?: (event: React.FocusEvent<HTMLInputElement>) => void;
+  onKeyDown?: (event: React.KeyboardEvent<HTMLInputElement>) => void;
   wrapperClassName?: string;
   rounded?: string;
+  autoFocus?: boolean;
 }
 
 const SearchInput: React.FC<SearchInputProps> = ({
@@ -21,9 +23,11 @@ const SearchInput: React.FC<SearchInputProps> = ({
   width = "320px",
   height = "45px",
   onBlur,
+  onKeyDown,
   className,
   wrapperClassName,
   rounded,
+  autoFocus = false,
 }) => {
   return (
     <div
@@ -32,12 +36,13 @@ const SearchInput: React.FC<SearchInputProps> = ({
     >
       <div className="relative flex items-center w-full" style={{ height }}>
         <div className="absolute left-4 flex items-center justify-center pointer-events-none z-10">
-          <FiSearch className="text-[#64748b] text-[16px] md:text-[18px]" />
+          <Icon name="fi:search" className="text-[#64748b] text-[16px] md:text-[18px]" />
         </div>
         <input
           type="text"
-          autoFocus
+          autoFocus={autoFocus}
           onBlur={onBlur}
+          onKeyDown={onKeyDown}
           value={value}
           onChange={onChange}
           placeholder={placeholder}

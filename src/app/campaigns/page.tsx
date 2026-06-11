@@ -1,26 +1,15 @@
 "use client";
 
+import Icon from "@/components/ui/Icon";
 import { useEffect, useMemo, useState } from "react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import {
-  FiActivity,
-  FiBookOpen,
-  FiCalendar,
-  FiCheckCircle,
-  FiClock,
-  FiCpu,
-  FiRefreshCw,
-  FiSave,
-  FiSend,
-  FiSliders,
-  FiZap,
-} from "react-icons/fi";
-import { Button } from "@/components/Common/Button";
+import { Button } from "@/components/shared/Button";
 import { useRouter } from "next/navigation";
-import CustomInput from "@/components/Common/inputField";
-import StatusBadge from "@/components/Common/StatusBadge";
-import ToggleButton from "@/components/Common/ToggleButton";
+import CustomInput from "@/components/shared/inputField";
+import StatusBadge from "@/components/shared/StatusBadge";
+import ToggleButton from "@/components/shared/ToggleButton";
 import { ToasterUtils } from "@/components/ui/toast";
+import Skeleton from "@/components/shared/Skeleton";
 import {
   AutomationRule,
   type VariableMappings,
@@ -393,6 +382,10 @@ export default function CampaignsPage() {
   const rules = rulesQuery.data || [];
   const automationTemplates = automationTemplatesQuery.data || [];
   const whatsappTemplates = whatsappTemplatesQuery.data?.data || [];
+  const isInitialLoading =
+    rulesQuery.isLoading ||
+    automationTemplatesQuery.isLoading ||
+    whatsappTemplatesQuery.isLoading;
   const activeRule = findRule(rules, selectedCampaign);
   const liveCount = rules.filter((rule) => rule.enabled).length;
   const pausedCount = Math.max(0, rules.length - liveCount);
@@ -489,7 +482,7 @@ export default function CampaignsPage() {
           <div className="flex flex-col gap-2 sm:flex-row">
             <Button
               text="Sync Templates"
-              icon={FiRefreshCw}
+              icon="fi:refresh-cw"
               variant="outline"
               color="surface"
               onClick={() => syncTemplatesMutation.mutate()}
@@ -499,7 +492,7 @@ export default function CampaignsPage() {
             />
             <Button
               text="Seed Defaults"
-              icon={FiCheckCircle}
+              icon="fi:check-circle"
               variant="outline"
               color="surface"
               onClick={() => seedMutation.mutate()}
@@ -512,12 +505,28 @@ export default function CampaignsPage() {
       </section>
 
       <section className="grid gap-3 md:grid-cols-4">
-        <MetricTile icon={FiActivity} label="Total campaigns" value={String(CAMPAIGNS.length)} />
-        <MetricTile icon={FiZap} label="Live campaigns" value={String(liveCount)} />
-        <MetricTile icon={FiClock} label="Paused campaigns" value={String(pausedCount)} />
-        <MetricTile icon={FiCpu} label="Ready campaigns" value={String(readyCount)} />
+        {isInitialLoading ? (
+          <div className="md:col-span-4">
+            <Skeleton type="card" rows={1} cardPerRow={4} cardHeight={70} />
+          </div>
+        ) : (
+          <>
+            <MetricTile icon="fi:activity" label="Total campaigns" value={String(CAMPAIGNS.length)} />
+            <MetricTile icon="fi:zap" label="Live campaigns" value={String(liveCount)} />
+            <MetricTile icon="fi:clock" label="Paused campaigns" value={String(pausedCount)} />
+            <MetricTile icon="fi:cpu" label="Ready campaigns" value={String(readyCount)} />
+          </>
+        )}
       </section>
 
+      {isInitialLoading ? (
+        <section className="grid gap-6 lg:grid-cols-[360px_minmax(0,1fr)]">
+          <Skeleton type="card" rows={3} cardPerRow={1} cardHeight={118} />
+          <Skeleton type="card" rows={1} cardPerRow={1} cardHeight={520} />
+        </section>
+      ) : null}
+
+      {!isInitialLoading ? (
       <section className="grid gap-6 lg:grid-cols-[360px_minmax(0,1fr)]">
         <div className="space-y-3">
           {CAMPAIGNS.map((campaign) => {
@@ -624,7 +633,7 @@ export default function CampaignsPage() {
                   </div>
                   <Button
                     text="Create from Library"
-                    icon={FiBookOpen}
+                    icon="fi:book-open"
                     variant="outline"
                     color="surface"
                     size="sm"
@@ -727,15 +736,15 @@ export default function CampaignsPage() {
                 )}
 
                 <div className="grid gap-3 md:grid-cols-3">
-                  <InfoTile icon={FiSliders} label="Trigger" value={selectedCampaign.trigger} />
-                  <InfoTile icon={FiClock} label="Delay" value={formatDelay(Number(delayHours || 0) * 3600)} />
-                  <InfoTile icon={FiCalendar} label="Type" value={selectedCampaign.category} />
+                  <InfoTile icon="fi:sliders" label="Trigger" value={selectedCampaign.trigger} />
+                  <InfoTile icon="fi:clock" label="Delay" value={formatDelay(Number(delayHours || 0) * 3600)} />
+                  <InfoTile icon="fi:calendar" label="Type" value={selectedCampaign.category} />
                 </div>
 
                 <div className="flex justify-end">
                   <Button
                     text={activeRule ? "Save Campaign" : "Create Campaign"}
-                    icon={FiSave}
+                    icon="fi:save"
                     onClick={() => saveMutation.mutate()}
                     loading={saveMutation.isPending}
                     disabled={saveMutation.isPending || !canSave}
@@ -746,7 +755,7 @@ export default function CampaignsPage() {
 
               <aside className="rounded-md border border-default bg-surface-strong p-4">
                 <div className="flex items-center gap-2 text-sm font-semibold text-foreground">
-                  <FiSend className="h-4 w-4" />
+                  <Icon name="fi:send" className="h-4 w-4" />
                   Message preview
                 </div>
                 <div className="mt-4 rounded-md bg-white p-4 text-sm leading-6 text-foreground shadow-sm">
@@ -773,27 +782,28 @@ export default function CampaignsPage() {
           </section>
         </div>
       </section>
+      ) : null}
     </div>
   );
 }
 
-function MetricTile({ icon: Icon, label, value }: { icon: typeof FiClock; label: string; value: string }) {
+function MetricTile({ icon, label, value }: { icon: string; label: string; value: string }) {
   return (
     <div className="rounded-md border border-default bg-surface px-4 py-3">
       <div className="flex items-center justify-between gap-3">
         <p className="text-xs font-medium uppercase text-muted">{label}</p>
-        <Icon className="h-4 w-4 text-primary" />
+        <Icon name={icon} className="h-4 w-4 text-primary" />
       </div>
       <p className="mt-2 text-2xl font-semibold text-foreground">{value}</p>
     </div>
   );
 }
 
-function InfoTile({ icon: Icon, label, value }: { icon: typeof FiClock; label: string; value: string }) {
+function InfoTile({ icon, label, value }: { icon: string; label: string; value: string }) {
   return (
     <div className="rounded-md border border-default bg-white px-3 py-2">
       <div className="flex items-center gap-2 text-xs text-muted">
-        <Icon className="h-3.5 w-3.5" />
+        <Icon name={icon} className="h-3.5 w-3.5" />
         {label}
       </div>
       <p className="mt-1 truncate text-sm font-semibold text-foreground">{value}</p>

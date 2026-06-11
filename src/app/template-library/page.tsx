@@ -1,18 +1,10 @@
 "use client";
 
+import Icon from "@/components/ui/Icon";
 import { useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
-import {
-  FiArrowRight,
-  FiCheckCircle,
-  FiFilter,
-  FiRefreshCw,
-  FiSearch,
-  FiShoppingBag,
-  FiTruck,
-  FiZap,
-} from "react-icons/fi";
-import { Button } from "@/components/Common/Button";
+import { Button, SearchInput } from "@/components/shared";
+import { useDebouncedValue } from "@/hooks/useDebouncedValue";
 
 type TemplateCategory = "MARKETING" | "UTILITY";
 type TemplateBlueprint = {
@@ -125,9 +117,10 @@ export default function TemplateLibraryPage() {
   const router = useRouter();
   const [category, setCategory] = useState<(typeof categoryOptions)[number]>("All");
   const [search, setSearch] = useState("");
+  const debouncedSearch = useDebouncedValue(search.trim(), 300);
 
   const filteredTemplates = useMemo(() => {
-    const term = search.trim().toLowerCase();
+    const term = debouncedSearch.toLowerCase();
     return BLUEPRINTS.filter((template) => {
       const categoryMatch = category === "All" || template.category === category;
       const searchMatch =
@@ -138,7 +131,7 @@ export default function TemplateLibraryPage() {
           .includes(term);
       return categoryMatch && searchMatch;
     });
-  }, [category, search]);
+  }, [category, debouncedSearch]);
 
   const openTemplateDesigner = (template: TemplateBlueprint) => {
     const params = new URLSearchParams({
@@ -162,7 +155,7 @@ export default function TemplateLibraryPage() {
           </div>
           <Button
             text="View Approved Templates"
-            icon={FiCheckCircle}
+            icon="fi:check-circle"
             variant="outline"
             color="surface"
             onClick={() => router.push("/template-message")}
@@ -172,24 +165,25 @@ export default function TemplateLibraryPage() {
       </section>
 
       <section className="grid gap-3 md:grid-cols-4">
-        <MetricTile icon={FiZap} label="Draft packs" value={String(BLUEPRINTS.length)} />
-        <MetricTile icon={FiShoppingBag} label="Marketing" value={String(BLUEPRINTS.filter((item) => item.category === "MARKETING").length)} />
-        <MetricTile icon={FiTruck} label="Utility" value={String(BLUEPRINTS.filter((item) => item.category === "UTILITY").length)} />
-        <MetricTile icon={FiRefreshCw} label="Approval path" value="Meta" />
+        <MetricTile icon="fi:zap" label="Draft packs" value={String(BLUEPRINTS.length)} />
+        <MetricTile icon="fi:shopping-bag" label="Marketing" value={String(BLUEPRINTS.filter((item) => item.category === "MARKETING").length)} />
+        <MetricTile icon="fi:truck" label="Utility" value={String(BLUEPRINTS.filter((item) => item.category === "UTILITY").length)} />
+        <MetricTile icon="fi:refresh-cw" label="Approval path" value="Meta" />
       </section>
 
       <section className="flex flex-col gap-3 border-b border-default pb-4 md:flex-row md:items-center md:justify-between">
-        <div className="flex min-w-0 flex-1 items-center gap-2 rounded-md border border-default bg-white px-3 py-2">
-          <FiSearch className="h-4 w-4 shrink-0 text-muted" />
-          <input
+        <div className="min-w-0 flex-1">
+          <SearchInput
             value={search}
             onChange={(event) => setSearch(event.target.value)}
             placeholder="Search by use case, trigger, or copy"
-            className="w-full bg-transparent text-sm text-foreground outline-none"
+            width="100%"
+            height="40px"
+            rounded="rounded-md"
           />
         </div>
         <div className="flex items-center gap-2">
-          <FiFilter className="h-4 w-4 text-muted" />
+          <Icon name="fi:filter" className="h-4 w-4 text-muted" />
           <select
             value={category}
             onChange={(event) => setCategory(event.target.value as (typeof categoryOptions)[number])}
@@ -235,7 +229,7 @@ export default function TemplateLibraryPage() {
               <p className="text-xs text-muted">{template.performanceNote}</p>
               <Button
                 text="Customize"
-                icon={FiArrowRight}
+                icon="fi:arrow-right"
                 iconPosition="right"
                 size="sm"
                 onClick={() => openTemplateDesigner(template)}
@@ -248,12 +242,12 @@ export default function TemplateLibraryPage() {
   );
 }
 
-function MetricTile({ icon: Icon, label, value }: { icon: typeof FiZap; label: string; value: string }) {
+function MetricTile({ icon, label, value }: { icon: string; label: string; value: string }) {
   return (
     <div className="rounded-md border border-default bg-surface px-4 py-3">
       <div className="flex items-center justify-between gap-3">
         <p className="text-xs font-medium uppercase text-muted">{label}</p>
-        <Icon className="h-4 w-4 text-primary" />
+        <Icon name={icon} className="h-4 w-4 text-primary" />
       </div>
       <p className="mt-2 text-2xl font-semibold text-foreground">{value}</p>
     </div>

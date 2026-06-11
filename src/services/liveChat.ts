@@ -1,29 +1,7 @@
 import api from "@/lib/api";
+import type { LiveChatContact, LiveChatMessage } from "@/types/liveChat";
 
-export type LiveChatContact = {
-  id: string;
-  customer_phone_number: string;
-  profile_name: string;
-  custom_name?: string | null;
-  last_message: string;
-  last_message_time?: string | null;
-  unread_count?: number;
-  status?: string;
-  isWindowOpen?: boolean;
-};
-
-export type LiveChatMessage = {
-  id: string | number;
-  msg_id?: string | number;
-  from_no?: string;
-  to_no?: string;
-  message_body: string;
-  message_type: string;
-  payload?: unknown;
-  direction: "in" | "out" | "incoming" | "outgoing";
-  status?: string;
-  created_at: string;
-};
+export type { LiveChatContact, LiveChatMessage } from "@/types/liveChat";
 
 type ListResponse<T> = {
   data: T[];
@@ -71,4 +49,18 @@ export function getLiveChatSocketUrl() {
   if (!apiUrl) return "";
 
   return apiUrl.replace(/^http/i, "ws").replace(/\/$/, "") + "/ws/live-chat";
+}
+
+export function getLiveChatSocketBaseUrl() {
+  const explicitUrl = process.env.NEXT_PUBLIC_SOCKET_URL?.trim();
+  const apiUrl = process.env.NEXT_PUBLIC_API_URL?.trim() || "";
+  const source = explicitUrl || apiUrl;
+  if (!source) return "";
+
+  return source
+    .replace(/^wss:/i, "https:")
+    .replace(/^ws:/i, "http:")
+    .replace(/\/ws\/live-chat\/?$/i, "")
+    .replace(/\/api\/v\d+\/?$/i, "")
+    .replace(/\/$/, "");
 }

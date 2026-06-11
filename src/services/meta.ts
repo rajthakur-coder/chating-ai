@@ -1,11 +1,7 @@
 import api from "@/lib/api";
+import type { WhatsAppNumberSetupPayload } from "@/types/meta";
 
-export type WhatsAppNumberSetupPayload = {
-  authorization_token: string;
-  phone_number_id: string;
-  waba_id: string;
-  business_id: string;
-};
+export type { WhatsAppNumberSetupPayload } from "@/types/meta";
 
 export async function setupWhatsappNumber(payload: WhatsAppNumberSetupPayload) {
   const response = await api.post("/whatsapp-credential/number-setup", payload);

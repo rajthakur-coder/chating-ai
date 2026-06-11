@@ -1,8 +1,8 @@
 "use client";
 
+import Icon from "@/components/ui/Icon";
 import { useEffect, useMemo, useState } from "react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { FiEdit2, FiMoreVertical, FiPlus, FiTrash2 } from "react-icons/fi";
 import {
   Button,
   ButtonDropdown,
@@ -11,9 +11,11 @@ import {
   SearchInput,
   Skeleton,
   Tabs,
-} from "@/components/Common";
+} from "@/components/shared";
 import { cn } from "@/lib/utils";
+import { useDebouncedValue } from "@/hooks/useDebouncedValue";
 import AddContact from "@/modals/ApiModal/AddContact";
+import BaseModal from "@/modals/BaseModals/BaseModal";
 import {
   Contact,
   ContactStatus,
@@ -97,18 +99,20 @@ export default function ContactsPage() {
   const [currentPage, setCurrentPage] = useState(1);
   const [addOpen, setAddOpen] = useState(false);
   const [editingContact, setEditingContact] = useState<RowContact | null>(null);
+  const [deletingContact, setDeletingContact] = useState<RowContact | null>(null);
+  const debouncedSearch = useDebouncedValue(search.trim(), 300);
 
   useEffect(() => {
     setCurrentPage(1);
-  }, [activeTab, search, selectedTag]);
+  }, [activeTab, debouncedSearch, selectedTag]);
 
   const contactsQuery = useQuery({
-    queryKey: ["contacts", currentPage, search, activeTab, selectedTag],
+    queryKey: ["contacts", currentPage, debouncedSearch, activeTab, selectedTag],
     queryFn: () =>
       getContacts({
         offset: currentPage - 1,
         limit: PAGE_SIZE,
-        searchValue: search || undefined,
+        searchValue: debouncedSearch || undefined,
         status: activeTab === "All" ? undefined : activeTab,
         tags: selectedTag || undefined,
       }),
@@ -202,6 +206,7 @@ export default function ContactsPage() {
       getSuccessMessage: (result) => result.message || "Contact deleted",
       errorMessage: "Delete failed",
     });
+    setDeletingContact(null);
   };
 
   const handleStatusChange = async (contact: RowContact, status: ContactStatus) => {
@@ -228,7 +233,7 @@ export default function ContactsPage() {
 
   return (
     <div className="flex h-full min-h-0 flex-col overflow-hidden bg-bodycolor">
-      <div className="flex min-h-0 flex-1 flex-col overflow-hidden px-5 pb-4 pt-5">
+      <div className="flex min-h-0 flex-1 flex-col overflow-hidden  pb-4 pt-5">
         {(addOpen || editingContact) && (
           <AddContact
             isOpen={addOpen || Boolean(editingContact)}
@@ -249,6 +254,40 @@ export default function ContactsPage() {
             onSave={handleSaveContact}
           />
         )}
+
+        <BaseModal
+          isOpen={Boolean(deletingContact)}
+          toggle={() => setDeletingContact(null)}
+          headerText="Delete Contact"
+          onCancel={() => setDeletingContact(null)}
+          onConfirm={() => {
+            if (deletingContact) {
+              handleDelete(deletingContact);
+            }
+          }}
+          confirmText="Delete"
+          cancelText="Cancel"
+          confirmColor="bg-red-600 text-white hover:bg-red-700"
+          isLoading={deleteMutation.isPending}
+          widthClass="max-w-[95%] sm:w-[420px]"
+          maxHeight="max-h-[80vh]"
+        >
+          <div className="space-y-3 py-2">
+            <p className="text-sm text-slate-600">
+              Are you sure you want to delete this contact? This action cannot be undone.
+            </p>
+            {deletingContact ? (
+              <div className="rounded-lg border border-red-100 bg-red-50 px-4 py-3">
+                <p className="text-sm font-semibold text-slate-900">
+                  {deletingContact.name}
+                </p>
+                <p className="mt-1 text-xs text-slate-600">
+                  {deletingContact.mobile}
+                </p>
+              </div>
+            ) : null}
+          </div>
+        </BaseModal>
 
         <h1 className="mb-4 text-2xl font-semibold text-foreground">Contacts</h1>
 
@@ -289,7 +328,7 @@ export default function ContactsPage() {
                 text="Add Contact"
                 color="light"
                 variant="ghost"
-                icon={FiPlus}
+                icon="fi:plus"
                 width="100%"
                 className="md:w-[160px]"
                 iconPosition="left"
@@ -382,7 +421,7 @@ export default function ContactsPage() {
                               onClick={() => handleAddTag(contact)}
                               className="flex h-6 w-6 items-center justify-center rounded-full border border-foreground shadow-sm transition-all duration-300 hover:bg-white active:scale-95"
                             >
-                              <FiPlus size={14} />
+                              <Icon name="fi:plus" size={14} />
                             </button>
                           </div>
                         </td>
@@ -427,17 +466,17 @@ export default function ContactsPage() {
                               onClick={() => setEditingContact(contact)}
                               className="rounded-full p-2 transition-colors hover:bg-bodycolor"
                             >
-                              <FiEdit2 className="text-slate-500" size={18} />
+                              <Icon name="fi:edit-2" className="text-slate-500" size={18} />
                             </button>
                             <button
                               type="button"
                               aria-label="Delete contact"
-                              onClick={() => handleDelete(contact)}
+                              onClick={() => setDeletingContact(contact)}
                               className="rounded-full p-2 transition-colors hover:bg-red-50"
                             >
-                              <FiTrash2 className="text-red-500" size={18} />
+                              <Icon name="fi:trash2" className="text-red-500" size={18} />
                             </button>
-                            <FiMoreVertical className="mt-2 text-slate-300" size={18} />
+                            <Icon name="fi:more-vertical" className="mt-2 text-slate-300" size={18} />
                           </div>
                         </td>
                       </tr>

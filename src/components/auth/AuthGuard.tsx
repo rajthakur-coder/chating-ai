@@ -1,5 +1,6 @@
 "use client";
 
+import AppLoading from "@/components/misc/AppLoading";
 import { getCurrentUser } from "@/services/auth";
 import { useQuery } from "@tanstack/react-query";
 import { usePathname } from "next/navigation";
@@ -68,11 +69,7 @@ export default function AuthGuard({ children }: AuthGuardProps) {
   }
 
   if (currentUserQuery.isLoading || !currentUserQuery.isSuccess) {
-    return (
-      <div className="flex min-h-screen items-center justify-center bg-slate-50 text-sm font-medium text-slate-600 dark:bg-slate-950 dark:text-slate-300">
-        Checking session...
-      </div>
-    );
+    return <AppLoading  />;
   }
 
   return <>{children}</>;

@@ -1,8 +1,8 @@
 "use client";
 
-import { useEffect } from "react";
-import { FiRefreshCw, FiAlertTriangle, FiHome } from "react-icons/fi";
 
+import Icon from "@/components/ui/Icon";
+import { useEffect } from "react";
 type ErrorProps = {
   error: Error & { digest?: string };
   reset: () => void;
@@ -23,7 +23,7 @@ export default function GlobalError({ error, reset }: ErrorProps) {
 
         {/* Warning Icon Container */}
         <div className="relative mx-auto flex h-16 w-16 items-center justify-center rounded-2xl bg-red-50 text-red-500 shadow-sm dark:bg-red-500/10">
-          <FiAlertTriangle size={32} className="animate-pulse" />
+          <Icon name="fi:alert-triangle" size={32} className="animate-pulse" />
         </div>
 
         {/* Header */}
@@ -56,7 +56,7 @@ export default function GlobalError({ error, reset }: ErrorProps) {
             onClick={reset}
             className="flex h-11 items-center justify-center gap-2 rounded-xl bg-emerald-600 px-5 text-sm font-semibold text-white shadow-md shadow-emerald-500/20 transition-all hover:bg-emerald-700 hover:shadow-lg hover:shadow-emerald-500/30 focus:ring-2 focus:ring-emerald-500/50"
           >
-            <FiRefreshCw className="animate-spin-slow" size={16} />
+            <Icon name="fi:refresh-cw" className="animate-spin-slow" size={16} />
             <span>Try Again</span>
           </button>
 
@@ -65,7 +65,7 @@ export default function GlobalError({ error, reset }: ErrorProps) {
             onClick={() => (window.location.href = "/dashboard")}
             className="flex h-11 items-center justify-center gap-2 rounded-xl border border-slate-200 bg-white px-5 text-sm font-semibold text-slate-600 transition-all hover:bg-slate-50 dark:border-slate-800 dark:bg-slate-900 dark:text-slate-300 dark:hover:bg-slate-800"
           >
-            <FiHome size={16} />
+            <Icon name="fi:home" size={16} />
             <span>Return Home</span>
           </button>
         </div>

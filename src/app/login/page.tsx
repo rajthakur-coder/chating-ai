@@ -1,8 +1,8 @@
 "use client";
 
+import Icon from "@/components/ui/Icon";
 import { FormEvent, Suspense, useMemo, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
-import { FiEye, FiEyeOff, FiLock, FiMail, FiMessageCircle } from "react-icons/fi";
 import { AxiosError } from "axios";
 import { signIn } from "@/services/auth";
 import { ToasterUtils } from "@/components/ui/toast";
@@ -67,7 +67,7 @@ function LoginContent() {
         <section className="hidden bg-[#101820] px-10 py-12 text-white lg:flex lg:flex-col lg:justify-between">
           <div className="flex items-center gap-3">
             <div className="flex h-11 w-11 items-center justify-center rounded-md bg-emerald-500 text-white">
-              <FiMessageCircle size={22} />
+              <Icon name="fi:message-circle" size={22} />
             </div>
             <div>
               <p className="text-lg font-semibold">AlignChat</p>
@@ -95,7 +95,7 @@ function LoginContent() {
           <div className="w-full max-w-[420px] rounded-md border border-slate-200 bg-white p-7 shadow-xl dark:border-slate-800 dark:bg-slate-900">
             <div className="mb-7 lg:hidden">
               <div className="mb-5 flex h-11 w-11 items-center justify-center rounded-md bg-emerald-500 text-white">
-                <FiMessageCircle size={22} />
+                <Icon name="fi:message-circle" size={22} />
               </div>
               <p className="text-sm font-semibold text-emerald-600 dark:text-emerald-300">
                 AlignChat
@@ -115,7 +115,7 @@ function LoginContent() {
                   Email
                 </label>
                 <div className="relative">
-                  <FiMail className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" />
+                  <Icon name="fi:mail" className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" />
                   <input
                     id="email"
                     type="email"
@@ -134,7 +134,7 @@ function LoginContent() {
                   Password
                 </label>
                 <div className="relative">
-                  <FiLock className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" />
+                  <Icon name="fi:lock" className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" />
                   <input
                     id="password"
                     type={showPassword ? "text" : "password"}
@@ -152,7 +152,7 @@ function LoginContent() {
                     aria-label={showPassword ? "Hide password" : "Show password"}
                     disabled={isLoading}
                   >
-                    {showPassword ? <FiEyeOff size={17} /> : <FiEye size={17} />}
+                    {showPassword ? <Icon name="fi:eye-off" size={17} /> : <Icon name="fi:eye" size={17} />}
                   </button>
                 </div>
               </div>

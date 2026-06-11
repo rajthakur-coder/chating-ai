@@ -65,9 +65,5 @@ export const sidebarLinks: SidebarLinkItem[] = [
     href: ROUTES.shopifyIntegration,
     icon: "si:shopify",
   },
-  {
-    label: "WooCommerce",
-    href: ROUTES.woocommerceIntegration,
-    icon: "si:woocommerce",
-  },
+ 
 ];

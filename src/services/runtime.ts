@@ -1,9 +1,7 @@
 import api from "@/lib/api";
+import type { RuntimeConfig } from "@/types/runtime";
 
-export type RuntimeConfig = {
-  shopify_webhook_automation_enabled: boolean;
-  automation_processor_enabled: boolean;
-};
+export type { RuntimeConfig } from "@/types/runtime";
 
 export async function getRuntimeConfig() {
   const response = await api.get<RuntimeConfig>("/runtime/config");

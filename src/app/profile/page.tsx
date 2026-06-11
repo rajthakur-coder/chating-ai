@@ -1,19 +1,12 @@
 "use client";
 
+import Icon from "@/components/ui/Icon";
 import { useMemo, useState } from "react";
-import {
-  FiCamera,
-  FiClock,
-  FiFileText,
-  FiPlus,
-  FiShield,
-  FiUser,
-} from "react-icons/fi";
-import Tabs from "@/components/Common/Tabs";
-import CustomInput from "@/components/Common/inputField";
-import { Button } from "@/components/Common/Button";
-import StatusBadge from "@/components/Common/StatusBadge";
-import Pagination from "@/components/Common/Pagination";
+import Tabs from "@/components/shared/Tabs";
+import CustomInput from "@/components/shared/inputField";
+import { Button } from "@/components/shared/Button";
+import StatusBadge from "@/components/shared/StatusBadge";
+import Pagination from "@/components/shared/Pagination";
 import { ToasterUtils } from "@/components/ui/toast";
 
 type ProfileTab = "Profile" | "Billing Profile" | "Password" | "LoginHistory";
@@ -80,7 +73,7 @@ const ProfileInfoCard = ({
             </span>
           )}
           <span className="absolute inset-0 hidden items-center justify-center bg-black/30 text-white transition group-hover:flex">
-            <FiCamera className="h-7 w-7" />
+            <Icon name="fi:camera" className="h-7 w-7" />
           </span>
           <input
             type="file"
@@ -137,7 +130,7 @@ const BillingProfile = () => {
         }}
         className="flex min-h-[208px] w-full flex-col items-center justify-center rounded-2xl border-2 border-dashed border-purple-300 bg-white transition hover:border-purple-500 hover:bg-purple-50 lg:w-1/3"
       >
-        <FiPlus className="mb-2 h-9 w-9 text-purple-600" />
+        <Icon name="fi:plus" className="mb-2 h-9 w-9 text-purple-600" />
         <span className="text-lg font-semibold text-purple-600">
           Create Billing Profile
         </span>
@@ -179,17 +172,17 @@ export default function ProfilePage() {
 
   const tabs = useMemo(
     () => [
-      { name: "Profile", key: "Profile", icon: <FiUser /> },
+      { name: "Profile", key: "Profile", icon: <Icon name="fi:user" /> },
       {
         name: "Billing Profile",
         key: "Billing Profile",
-        icon: <FiFileText />,
+        icon: <Icon name="fi:file-text" />,
       },
-      { name: "Password", key: "Password", icon: <FiShield /> },
+      { name: "Password", key: "Password", icon: <Icon name="fi:shield" /> },
       {
         name: "Login History",
         key: "LoginHistory",
-        icon: <FiClock />,
+        icon: <Icon name="fi:clock" />,
       },
     ],
     [],

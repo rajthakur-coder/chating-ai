@@ -1,8 +1,8 @@
 "use client";
 
+import Icon from "@/components/ui/Icon";
 import React, { useEffect, useRef, useState } from "react";
 import clsx from "clsx";
-import { FiChevronLeft, FiChevronRight } from "react-icons/fi";
 
 export interface Tab {
   name: string;
@@ -115,7 +115,7 @@ const Tabs: React.FC<TabsProps> = ({
           onClick={() => scrollByHalf(-1)}
           className="absolute left-0 top-1/2 z-10 h-8 w-8 -translate-y-1/2"
         >
-          <FiChevronLeft className="text-lg text-slate-500" />
+          <Icon name="fi:chevron-left" className="text-lg text-slate-500" />
         </button>
       )}
 
@@ -174,7 +174,7 @@ const Tabs: React.FC<TabsProps> = ({
           onClick={() => scrollByHalf(1)}
           className="absolute right-0 top-1/2 z-10 h-8 w-8 -translate-y-1/2"
         >
-          <FiChevronRight className="text-lg text-slate-500" />
+          <Icon name="fi:chevron-right" className="text-lg text-slate-500" />
         </button>
       )}
     </div>

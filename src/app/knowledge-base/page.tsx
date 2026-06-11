@@ -1,8 +1,8 @@
 "use client";
 
+import Icon from "@/components/ui/Icon";
 import { FormEvent, useEffect, useMemo, useState } from "react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { FiRefreshCw, FiSave } from "react-icons/fi";
 import {
   getKnowledgeBase,
   KnowledgeBase,
@@ -10,8 +10,9 @@ import {
   scrapeWebsite,
 } from "@/services/knowledgeBase";
 import { ToasterUtils } from "@/components/ui/toast";
-import { Button } from "@/components/Common/Button";
-import CustomInput from "@/components/Common/inputField";
+import { Button } from "@/components/shared/Button";
+import CustomInput from "@/components/shared/inputField";
+import Skeleton from "@/components/shared/Skeleton";
 
 const emptyKnowledge: KnowledgeBase = {
   website_link: "",
@@ -133,7 +134,7 @@ export default function KnowledgeBasePage() {
           <Button
             type="submit"
             text={scrapeMutation.isPending ? "Importing..." : "Import from Website"}
-            icon={FiRefreshCw}
+            icon="fi:refresh-cw"
             loading={scrapeMutation.isPending}
             loaderType="bounce"
             disabled={scrapeMutation.isPending}
@@ -143,6 +144,21 @@ export default function KnowledgeBasePage() {
         </div>
       </form>
 
+      {knowledgeQuery.isLoading ? (
+        <div className="space-y-6">
+          <section className="grid gap-6 lg:grid-cols-[320px_1fr]">
+            <Skeleton type="card" rows={1} cardPerRow={1} cardHeight={210} />
+            <Skeleton type="card" rows={1} cardPerRow={1} cardHeight={260} />
+          </section>
+          <section className="grid gap-6 lg:grid-cols-2">
+            <Skeleton type="card" rows={1} cardPerRow={1} cardHeight={260} />
+            <Skeleton type="card" rows={1} cardPerRow={1} cardHeight={260} />
+          </section>
+          <Skeleton type="card" rows={1} cardPerRow={1} cardHeight={150} />
+        </div>
+      ) : null}
+
+      {!knowledgeQuery.isLoading ? (
       <form onSubmit={handleSave} className="space-y-6">
         <section className="grid gap-6 lg:grid-cols-[320px_1fr]">
           <div className="rounded-lg border border-default bg-surface p-5">
@@ -248,7 +264,7 @@ export default function KnowledgeBasePage() {
           <Button
             type="submit"
             text={saveMutation.isPending ? "Saving..." : "Save Knowledge Base"}
-            icon={FiSave}
+            icon="fi:save"
             loading={saveMutation.isPending}
             loaderType="bounce"
             disabled={saveMutation.isPending || knowledgeQuery.isLoading}
@@ -256,6 +272,7 @@ export default function KnowledgeBasePage() {
           />
         </div>
       </form>
+      ) : null}
     </div>
   );
 }

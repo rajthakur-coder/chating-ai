@@ -1,24 +1,7 @@
 import api from "@/lib/api";
+import type { CurrentUser, SignInPayload, SignInResponse } from "@/types/auth";
 
-export type CurrentUser = {
-  id?: string;
-  email?: string;
-  name?: string;
-};
-
-export type SignInPayload = {
-  email: string;
-  password: string;
-};
-
-export type SignInResponse = {
-  id?: string;
-  email?: string;
-  name?: string;
-  verified?: boolean;
-  onboarding_completed?: boolean;
-  message?: string;
-};
+export type { CurrentUser, SignInPayload, SignInResponse } from "@/types/auth";
 
 export async function signIn(payload: SignInPayload) {
   const response = await api.post<SignInResponse>("/auth/sign-in", payload);

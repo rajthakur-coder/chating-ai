@@ -1,9 +1,9 @@
 "use client";
 
+import Icon from "@/components/ui/Icon";
 import React from "react";
-import { FiArrowLeft, FiGlobe, FiHome, FiMail, FiMapPin, FiMoreVertical, FiShare2 } from "react-icons/fi";
-import CustomInput from "@/components/Common/inputField";
-import FileUploadField from "@/components/Common/FileUpload";
+import CustomInput from "@/components/shared/inputField";
+import FileUploadField from "@/components/shared/FileUpload";
 
 export interface PhoneProfileFormData {
   about: string;
@@ -59,8 +59,8 @@ const PhoneContentForm: React.FC<PhoneContentFormProps> = ({
       <div className="flex h-full flex-col rounded-xl border border-gray-100 bg-gray-50 p-6">
         <div className="h-fit w-full overflow-hidden rounded-lg bg-white text-[13px] shadow-lg">
           <div className="flex items-center justify-between p-4">
-            <FiArrowLeft className="text-gray-400" size={20} />
-            <FiMoreVertical className="text-gray-400" size={20} />
+            <Icon name="fi:arrow-left" className="text-gray-400" size={20} />
+            <Icon name="fi:more-vertical" className="text-gray-400" size={20} />
           </div>
 
           <div className="flex flex-col items-center px-4 pb-4 text-center">
@@ -81,7 +81,7 @@ const PhoneContentForm: React.FC<PhoneContentFormProps> = ({
 
             <div className="mt-4 flex flex-col items-center">
               <div className="mb-1 rounded-full bg-emerald-50 p-2 text-emerald-700">
-                <FiShare2 size={20} />
+                <Icon name="fi:share2" size={20} />
               </div>
               <span className="text-[10px] font-bold text-emerald-700">Share</span>
             </div>
@@ -91,28 +91,28 @@ const PhoneContentForm: React.FC<PhoneContentFormProps> = ({
 
           <div className="space-y-4 p-4 text-gray-600">
             <div className="flex gap-3">
-              <FiHome className="mt-0.5 shrink-0 text-gray-400" size={16} />
+              <Icon name="fi:home" className="mt-0.5 shrink-0 text-gray-400" size={16} />
               <p className="overflow-hidden text-ellipsis break-words text-xs leading-tight">
                 {formData.description || "Description goes here..."}
               </p>
             </div>
             <div className="flex items-center gap-3">
-              <FiGlobe className="text-gray-400" size={16} />
+              <Icon name="fi:globe" className="text-gray-400" size={16} />
               <p>{formData.category || "Category"}</p>
             </div>
             <div className="flex gap-3">
-              <FiMapPin className="mt-0.5 shrink-0 text-gray-400" size={16} />
+              <Icon name="fi:map-pin" className="mt-0.5 shrink-0 text-gray-400" size={16} />
               <p className="text-xs text-blue-500">{formData.address || "Address"}</p>
             </div>
             <div className="flex items-center gap-3">
-              <FiMail className="text-gray-400" size={16} />
+              <Icon name="fi:mail" className="text-gray-400" size={16} />
               <p className="text-xs font-medium text-blue-500">
                 {formData.email || "Email"}
               </p>
             </div>
             {[formData.website1, formData.website2].filter(Boolean).map((website) => (
               <div key={website} className="flex items-center gap-3">
-                <FiGlobe className="text-gray-400" size={16} />
+                <Icon name="fi:globe" className="text-gray-400" size={16} />
                 <p className="text-xs font-medium text-blue-500">{website}</p>
               </div>
             ))}

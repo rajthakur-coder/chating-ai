@@ -1,22 +1,10 @@
 "use client";
 
+import Icon from "@/components/ui/Icon";
 import { useEffect, useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
-import {
-  FiArrowLeft,
-  FiBold,
-  FiChevronDown,
-  FiCode,
-  FiInfo,
-  FiImage,
-  FiItalic,
-  FiMapPin,
-  FiMenu,
-  FiPhone,
-  FiPlus,
-  FiTrash2,
-} from "react-icons/fi";
-import { Button, ButtonDropdown, RadioButton, ToggleButton } from "@/components/Common";
+import { Button, ButtonDropdown, RadioButton, ToggleButton } from "@/components/shared";
+import Skeleton from "@/components/shared/Skeleton";
 import languagesData from "@/data/languages.json";
 import {
   WhatsappTemplatePayload,
@@ -562,8 +550,13 @@ export default function TemplateDesignPage() {
   return (
     <div className="flex h-[calc(100vh-73px)] flex-col bg-bodycolor pb-20">
       {loadingTemplate ? (
-        <div className="flex flex-1 items-center justify-center">
-          <div className="loader" />
+        <div className="grid flex-1 grid-cols-1 gap-6 overflow-hidden p-6 lg:grid-cols-3">
+          <div className="space-y-5 lg:col-span-2">
+            <Skeleton type="text" rows={3} height={18} />
+            <Skeleton type="card" rows={1} cardPerRow={1} cardHeight={220} />
+            <Skeleton type="card" rows={1} cardPerRow={1} cardHeight={260} />
+          </div>
+          <Skeleton type="card" rows={1} cardPerRow={1} cardHeight={520} />
         </div>
       ) : (
         <>
@@ -572,7 +565,7 @@ export default function TemplateDesignPage() {
           onClick={() => router.back()}
           className="flex items-center gap-2 rounded-full px-2 py-1 text-sm font-medium text-foreground hover:bg-hovergreen"
         >
-          <FiArrowLeft size={18} />
+          <Icon name="fi:arrow-left" size={18} />
           Back
         </button>
         <div className="text-sm font-semibold text-slate-600">
@@ -703,7 +696,7 @@ export default function TemplateDesignPage() {
                     <div className="flex-1">
                       <div className="flex items-center gap-2 font-medium text-foreground">
                         {method.title}
-                        <FiInfo size={14} className="text-gray-400" />
+                        <Icon name="fi:info" size={14} className="text-gray-400" />
                       </div>
                       <p className="mt-1 text-sm text-slate-600">{method.desc}</p>
                       {authMethod === "zero" && method.key === "zero" ? (
@@ -962,16 +955,16 @@ export default function TemplateDesignPage() {
                 <div className="flex items-center justify-between rounded-b-md border border-t-0 border-bordercolor bg-bodycolor px-4 py-2">
                   <div className="flex items-center gap-3 text-slate-500">
                     <button type="button" onClick={() => applyFormatting("*")} title="Bold">
-                      <FiBold size={20} />
+                      <Icon name="fi:bold" size={20} />
                     </button>
                     <button type="button" onClick={() => applyFormatting("_")} title="Italic">
-                      <FiItalic size={20} />
+                      <Icon name="fi:italic" size={20} />
                     </button>
                     <button type="button" onClick={() => applyFormatting("~")} title="Strikethrough">
                       <span className="text-lg line-through">S</span>
                     </button>
                     <button type="button" onClick={() => applyFormatting("`")} title="Code">
-                      <FiCode size={20} />
+                      <Icon name="fi:code" size={20} />
                     </button>
                   </div>
                   <button
@@ -1037,7 +1030,7 @@ export default function TemplateDesignPage() {
                   onClick={() => setButtonMenuOpen((prev) => !prev)}
                   className="inline-flex items-center gap-2 rounded-md border px-4 py-2 text-sm hover:bg-hovergray"
                 >
-                  <FiPlus size={18} /> Add button <FiChevronDown size={14} />
+                  <Icon name="fi:plus" size={18} /> Add button <Icon name="fi:chevron-down" size={14} />
                 </button>
                 {buttonMenuOpen ? (
                   <div className="absolute right-0 z-50 mt-2 w-56 rounded-lg border bg-white py-1 shadow-lg">
@@ -1045,19 +1038,19 @@ export default function TemplateDesignPage() {
                       onClick={() => addButton("quick_reply", "Quick reply")}
                       className="flex w-full items-center gap-3 px-4 py-2 text-sm hover:bg-hovergray"
                     >
-                      <FiPlus size={16} /> Custom
+                      <Icon name="fi:plus" size={16} /> Custom
                     </button>
                     <button
                       onClick={() => addButton("visit_website", "Visit website")}
                       className="flex w-full items-center gap-3 px-4 py-2 text-sm hover:bg-hovergray"
                     >
-                      <FiCode size={16} /> Visit website
+                      <Icon name="fi:code" size={16} /> Visit website
                     </button>
                     <button
                       onClick={() => addButton("call", "Call now")}
                       className="flex w-full items-center gap-3 px-4 py-2 text-sm hover:bg-hovergray"
                     >
-                      <FiPhone size={16} /> Call on WhatsApp
+                      <Icon name="fi:phone" size={16} /> Call on WhatsApp
                     </button>
                   </div>
                 ) : null}
@@ -1075,7 +1068,7 @@ export default function TemplateDesignPage() {
                       key={button.id}
                       className="flex items-start gap-4 rounded-lg border p-4"
                     >
-                      <FiMenu size={18} className="mt-8 text-slate-400" />
+                      <Icon name="fi:menu" size={18} className="mt-8 text-slate-400" />
                       <div className="flex-1">
                         <label className="text-xs font-bold uppercase">
                           Button text
@@ -1093,7 +1086,7 @@ export default function TemplateDesignPage() {
                         onClick={() => removeButton(button.id)}
                         className="mt-8 text-slate-400 hover:text-foreground"
                       >
-                        <FiTrash2 size={18} />
+                        <Icon name="fi:trash2" size={18} />
                       </button>
                     </div>
                   ))}
@@ -1110,7 +1103,7 @@ export default function TemplateDesignPage() {
                       key={button.id}
                       className="flex items-start gap-4 rounded-lg border p-4"
                     >
-                      <FiMenu size={18} className="mt-8 text-slate-400" />
+                      <Icon name="fi:menu" size={18} className="mt-8 text-slate-400" />
                       <div className="grid flex-1 grid-cols-12 gap-4">
                         <div className="col-span-12 md:col-span-3">
                           <label className="text-xs font-bold uppercase">
@@ -1172,7 +1165,7 @@ export default function TemplateDesignPage() {
                         onClick={() => removeButton(button.id)}
                         className="mt-8 text-slate-400 hover:text-foreground"
                       >
-                        <FiTrash2 size={18} />
+                        <Icon name="fi:trash2" size={18} />
                       </button>
                     </div>
                   ))}
@@ -1243,9 +1236,9 @@ export default function TemplateDesignPage() {
                 {mediaSample !== "None" ? (
                   <div className="m-1 flex aspect-video items-center justify-center rounded-md border border-bordercolor bg-hovergray">
                     {mediaSample === "Location" ? (
-                      <FiMapPin size={64} className="text-gray-300" />
+                      <Icon name="fi:map-pin" size={64} className="text-gray-300" />
                     ) : (
-                      <FiImage size={64} className="text-gray-300" />
+                      <Icon name="fi:image" size={64} className="text-gray-300" />
                     )}
                   </div>
                 ) : null}

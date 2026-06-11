@@ -1,17 +1,8 @@
 "use client";
 
+import Icon from "@/components/ui/Icon";
 import { useMemo, useState } from "react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import {
-  FiAlertCircle,
-  FiCheckCircle,
-  FiClock,
-  FiMessageSquare,
-  FiRefreshCw,
-  FiRotateCcw,
-  FiShield,
-  FiUserCheck,
-} from "react-icons/fi";
 import {
   getHandoffs,
   HandoffTicket,
@@ -19,11 +10,11 @@ import {
   resolveHandoff,
 } from "@/services/handoffs";
 import { ToasterUtils } from "@/components/ui/toast";
-import { Button } from "@/components/Common/Button";
-import CustomInput from "@/components/Common/inputField";
-import Pagination from "@/components/Common/Pagination";
-import StatusBadge from "@/components/Common/StatusBadge";
-import Tabs from "@/components/Common/Tabs";
+import { Button } from "@/components/shared/Button";
+import CustomInput from "@/components/shared/inputField";
+import Pagination from "@/components/shared/Pagination";
+import StatusBadge from "@/components/shared/StatusBadge";
+import Tabs from "@/components/shared/Tabs";
 
 type StatusFilter = "open" | "closed" | "";
 
@@ -83,13 +74,13 @@ function MetricTile({
   label,
   value,
   detail,
-  icon: Icon,
+  icon,
   tone,
 }: {
   label: string;
   value: string | number;
   detail: string;
-  icon: typeof FiMessageSquare;
+  icon: string;
   tone: string;
 }) {
   return (
@@ -100,7 +91,7 @@ function MetricTile({
           <p className="mt-2 text-3xl font-semibold text-foreground">{value}</p>
         </div>
         <span className={`flex h-10 w-10 items-center justify-center rounded-md ${tone}`}>
-          <Icon size={18} />
+          <Icon name={icon} size={18} />
         </span>
       </div>
       <p className="mt-3 text-sm text-muted">{detail}</p>
@@ -130,6 +121,10 @@ export default function SupportTicketsPage() {
   const [status, setStatus] = useState<StatusFilter>("open");
   const [notes, setNotes] = useState<Record<number, string>>({});
   const [currentPage, setCurrentPage] = useState(1);
+  const [pendingAction, setPendingAction] = useState<{
+    ticketId: number;
+    action: "resolve" | "reopen";
+  } | null>(null);
   const pageSize = 8;
 
   const ticketsQuery = useQuery({
@@ -147,6 +142,7 @@ export default function SupportTicketsPage() {
       invalidateTickets();
     },
     onError: () => ToasterUtils.error("Unable to resolve ticket."),
+    onSettled: () => setPendingAction(null),
   });
 
   const reopenMutation = useMutation({
@@ -156,6 +152,7 @@ export default function SupportTicketsPage() {
       invalidateTickets();
     },
     onError: () => ToasterUtils.error("Unable to reopen ticket."),
+    onSettled: () => setPendingAction(null),
   });
 
   const allTickets = ticketsQuery.data || [];
@@ -184,10 +181,16 @@ export default function SupportTicketsPage() {
   const isMutating = resolveMutation.isPending || reopenMutation.isPending;
 
   const resolveTicket = (ticket: HandoffTicket) => {
+    setPendingAction({ ticketId: ticket.id, action: "resolve" });
     resolveMutation.mutate({
       ticketId: ticket.id,
       note: notes[ticket.id]?.trim(),
     });
+  };
+
+  const reopenTicket = (ticket: HandoffTicket) => {
+    setPendingAction({ ticketId: ticket.id, action: "reopen" });
+    reopenMutation.mutate(ticket.id);
   };
 
   return (
@@ -196,7 +199,7 @@ export default function SupportTicketsPage() {
         <div className="flex flex-col gap-4 lg:flex-row lg:items-end lg:justify-between">
           <div>
             <div className="mb-3 flex w-fit items-center gap-2 rounded-md border border-default bg-surface px-3 py-1 text-xs font-semibold uppercase tracking-wide text-muted">
-              <FiShield size={14} />
+              <Icon name="fi:shield" size={14} />
               Handoff Operations
             </div>
             <h1 className="text-2xl font-semibold text-foreground">
@@ -208,7 +211,7 @@ export default function SupportTicketsPage() {
           </div>
           <Button
             text="Refresh Queue"
-            icon={FiRefreshCw}
+            icon="fi:refresh-cw"
             variant="outline"
             color="surface"
             onClick={() => invalidateTickets()}
@@ -225,28 +228,28 @@ export default function SupportTicketsPage() {
           label="Open Queue"
           value={counts.open}
           detail="Customers waiting for a human reply."
-          icon={FiMessageSquare}
+          icon="fi:message-square"
           tone="bg-blue-50 text-blue-700"
         />
         <MetricTile
           label="Needs Attention"
           value={counts.aged}
           detail="Open tickets older than 8 hours."
-          icon={FiAlertCircle}
+          icon="fi:alert-circle"
           tone="bg-amber-50 text-amber-700"
         />
         <MetricTile
           label="Resolved"
           value={counts.closed}
           detail="Tickets closed with bot replies resumed."
-          icon={FiUserCheck}
+          icon="fi:user-check"
           tone="bg-emerald-50 text-emerald-700"
         />
         <MetricTile
           label="Total Handoffs"
           value={counts.total}
           detail="All customer handoff records."
-          icon={FiClock}
+          icon="fi:clock"
           tone="bg-slate-100 text-slate-700"
         />
       </section>
@@ -287,7 +290,7 @@ export default function SupportTicketsPage() {
           {ticketsQuery.isError ? (
             <div className="px-5 py-14 text-center">
               <div className="mx-auto flex h-12 w-12 items-center justify-center rounded-md bg-rose-50 text-rose-600">
-                <FiAlertCircle size={22} />
+                <Icon name="fi:alert-circle" size={22} />
               </div>
               <p className="mt-4 font-semibold text-foreground">Unable to load support tickets</p>
               <p className="mt-1 text-sm text-muted">Refresh the queue once the backend is reachable.</p>
@@ -297,7 +300,7 @@ export default function SupportTicketsPage() {
           {!ticketsQuery.isLoading && !ticketsQuery.isError && tickets.length === 0 ? (
             <div className="px-5 py-14 text-center">
               <div className="mx-auto flex h-12 w-12 items-center justify-center rounded-md bg-emerald-50 text-emerald-700">
-                <FiCheckCircle size={22} />
+                <Icon name="fi:check-circle" size={22} />
               </div>
               <p className="mt-4 font-semibold text-foreground">No tickets in this view</p>
               <p className="mt-1 text-sm text-muted">The queue is clear for the selected status.</p>
@@ -306,6 +309,10 @@ export default function SupportTicketsPage() {
 
           {paginatedTickets.map((ticket) => {
             const priority = getPriority(ticket);
+            const isResolvingTicket =
+              pendingAction?.ticketId === ticket.id && pendingAction.action === "resolve";
+            const isReopeningTicket =
+              pendingAction?.ticketId === ticket.id && pendingAction.action === "reopen";
             return (
               <article
                 key={ticket.id}
@@ -338,7 +345,7 @@ export default function SupportTicketsPage() {
                       {cleanReason(ticket.reason)}
                     </span>
                     <span className="inline-flex items-center gap-1 text-xs font-semibold text-muted">
-                      <FiClock size={13} />
+                      <Icon name="fi:clock" size={13} />
                       {formatAge(ticket.updated_at || ticket.created_at)}
                     </span>
                   </div>
@@ -364,10 +371,10 @@ export default function SupportTicketsPage() {
                       />
                       <Button
                         text="Resolve"
-                        icon={FiCheckCircle}
+                        icon="fi:check-circle"
                         onClick={() => resolveTicket(ticket)}
                         disabled={isMutating}
-                        loading={resolveMutation.isPending}
+                        loading={isResolvingTicket}
                         loaderType="bounce"
                         size="sm"
                         className="w-full"
@@ -384,10 +391,10 @@ export default function SupportTicketsPage() {
                       </p>
                       <Button
                         text="Reopen"
-                        icon={FiRotateCcw}
-                        onClick={() => reopenMutation.mutate(ticket.id)}
+                        icon="fi:rotate-ccw"
+                        onClick={() => reopenTicket(ticket)}
                         disabled={isMutating}
-                        loading={reopenMutation.isPending}
+                        loading={isReopeningTicket}
                         loaderType="bounce"
                         variant="outline"
                         color="surface"

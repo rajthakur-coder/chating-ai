@@ -1,5 +1,6 @@
 import React from "react";
 import clsx from "clsx";
+import CommonIcon from "@/components/ui/Icon";
 type ButtonVariant = "solid" | "outline" | "ghost";
 type ButtonColor =
   | "primary"
@@ -16,7 +17,7 @@ type LoaderType = "default" | "bounce";
 
 interface ButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
   text?: string;
-  icon?: React.ElementType<{ className?: string }>;
+  icon?: React.ElementType<{ className?: string }> | string;
   iconPosition?: "left" | "right";
   color?: ButtonColor;
   size?: ButtonSize;
@@ -32,7 +33,7 @@ interface ButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
 export const Button: React.FC<ButtonProps> = ({
   text = "Button",
   type = "button",
-  icon: Icon,
+  icon,
   iconPosition = "left",
   color = "primary",
   size = "md",
@@ -131,13 +132,23 @@ export const Button: React.FC<ButtonProps> = ({
       }}
       {...props}
     >
-      {Icon && iconPosition === "left" && (
-        <Icon
-          className={clsx(
-            "w-4 h-4 sm:w-5 sm:h-5",
-            loading && loaderType === "bounce" && "invisible",
-          )}
-        />
+      {icon && iconPosition === "left" && (
+        typeof icon === "string" ? (
+          <CommonIcon
+            name={icon}
+            className={clsx(
+              "w-4 h-4 sm:w-5 sm:h-5",
+              loading && loaderType === "bounce" && "invisible",
+            )}
+          />
+        ) : (
+          React.createElement(icon, {
+            className: clsx(
+              "w-4 h-4 sm:w-5 sm:h-5",
+              loading && loaderType === "bounce" && "invisible",
+            ),
+          })
+        )
       )}
       <span
         className={clsx(
@@ -152,13 +163,23 @@ export const Button: React.FC<ButtonProps> = ({
           <div className="loader" />
         </span>
       )}
-      {Icon && iconPosition === "right" && (
-        <Icon
-          className={clsx(
-            "w-4 h-4 sm:w-5 sm:h-5",
-            loading && loaderType === "bounce" && "invisible",
-          )}
-        />
+      {icon && iconPosition === "right" && (
+        typeof icon === "string" ? (
+          <CommonIcon
+            name={icon}
+            className={clsx(
+              "w-4 h-4 sm:w-5 sm:h-5",
+              loading && loaderType === "bounce" && "invisible",
+            )}
+          />
+        ) : (
+          React.createElement(icon, {
+            className: clsx(
+              "w-4 h-4 sm:w-5 sm:h-5",
+              loading && loaderType === "bounce" && "invisible",
+            ),
+          })
+        )
       )}
     </button>
   );

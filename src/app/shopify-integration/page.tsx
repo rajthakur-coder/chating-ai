@@ -18,7 +18,7 @@ const setupSteps = [
 
 export default function ShopifyIntegrationPage() {
   return (
-    <div className="mx-auto max-w-6xl space-y-6">
+    <div className="mx-auto max-w-7xl space-y-6">
       <section className="rounded-xl border border-default bg-surface p-6 shadow-default md:p-8">
         <div className="mb-8 flex items-start justify-between gap-4">
           <div>

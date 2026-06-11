@@ -1,29 +1,7 @@
 import api from "@/lib/api";
+import type { KnowledgeBase, ScraperResponse } from "@/types/knowledgeBase";
 
-export type KnowledgeSocial = {
-  type?: string;
-  social_type?: string;
-  url: string;
-};
-
-export type KnowledgeBase = {
-  website_link?: string | null;
-  company_name?: string | null;
-  industry?: string | null;
-  about_company?: string | null;
-  target_demographics?: string | null;
-  logo?: string | null;
-  socials: KnowledgeSocial[];
-  page_images: string[];
-  policies?: string | null;
-  faqs?: string | null;
-  updated_at?: string | null;
-};
-
-export type ScraperResponse = {
-  status: string;
-  data: KnowledgeBase;
-};
+export type { KnowledgeBase, KnowledgeSocial, ScraperResponse } from "@/types/knowledgeBase";
 
 export async function scrapeWebsite(websiteLink: string) {
   const response = await api.post<ScraperResponse>("/scrape", {

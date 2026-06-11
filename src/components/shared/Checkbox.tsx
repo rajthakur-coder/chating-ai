@@ -1,6 +1,6 @@
+import Icon from "@/components/ui/Icon";
 import React from "react";
 import clsx from "clsx";
-import { FiCheck } from "react-icons/fi";
 
 type CheckboxSize = "xs" | "sm" | "md" | "lg";
 type CheckboxShape = "square" | "rounded" | "roundedmd" | "circle";
@@ -51,7 +51,7 @@ const Checkbox: React.FC<CheckboxProps> = ({
 
   const renderIcon = () => {
     if (checkedIcon) return checkedIcon;
-    return <FiCheck className={clsx("w-3 h-3", iconColor)} strokeWidth={3} />;
+    return <Icon name="fi:check" className={clsx("w-3 h-3", iconColor)} strokeWidth={3} />;
   };
 
   const isTailwindBg = (color: string) => color.startsWith("bg-");

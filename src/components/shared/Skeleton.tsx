@@ -15,7 +15,14 @@ interface SkeletonProps {
 }
 
 const shimmerClass =
-  "relative overflow-hidden rounded-md bg-gray-100 before:absolute before:inset-0 before:-translate-x-full before:animate-[shimmer_1.6s_infinite_linear] before:bg-gradient-to-r before:from-transparent before:via-gray-200/60 before:to-transparent before:content-['']";
+  "relative overflow-hidden rounded-md bg-gray-100 before:absolute before:inset-0 before:-translate-x-full before:animate-[shimmer_1.6s_infinite_linear] before:bg-gradient-to-r before:from-transparent before:via-gray-200/60 before:to-transparent before:content-[''] dark:bg-slate-800 dark:before:via-slate-700/70";
+
+const cardGridClass: Record<number, string> = {
+  1: "md:grid-cols-1",
+  2: "md:grid-cols-2",
+  3: "md:grid-cols-3",
+  4: "md:grid-cols-4",
+};
 
 const Skeleton: React.FC<SkeletonProps> = ({
   type,
@@ -33,10 +40,10 @@ const Skeleton: React.FC<SkeletonProps> = ({
       : Array.from({ length: columns }, (_, index) => `col-${index}`);
 
     return (
-      <div className="overflow-hidden rounded-2xl border border-gray-100 bg-white shadow-sm">
+      <div className="overflow-hidden rounded-2xl border border-default bg-surface shadow-sm">
         <div className="overflow-x-auto">
           <table className="w-full border-collapse text-sm">
-            <thead className="border-b border-gray-100/80 bg-gray-50/70">
+            <thead className="border-b border-default bg-surface-strong">
               <tr>
                 {headers.map((_, index) => (
                   <th key={index} className="p-3 text-left font-medium text-gray-400">
@@ -47,7 +54,7 @@ const Skeleton: React.FC<SkeletonProps> = ({
             </thead>
             <tbody>
               {Array.from({ length: rows }, (_, rowIndex) => (
-                <tr key={rowIndex} className="border-b border-gray-100/80">
+                <tr key={rowIndex} className="border-b border-default">
                   {headers.map((_, colIndex) => (
                     <td key={colIndex} className="p-3">
                       <div className={clsx(shimmerClass, "h-3.5 w-4/5")} />
@@ -64,11 +71,11 @@ const Skeleton: React.FC<SkeletonProps> = ({
 
   if (type === "card") {
     return (
-      <div className={`grid gap-5 md:grid-cols-${cardPerRow}`}>
+      <div className={clsx("grid gap-5", cardGridClass[cardPerRow] || "md:grid-cols-3")}>
         {Array.from({ length: rows * cardPerRow }, (_, index) => (
           <div
             key={index}
-            className="rounded-xl border border-gray-100 bg-white p-4 shadow-sm"
+            className="rounded-xl border border-default bg-surface p-4 shadow-sm"
             style={{ width: cardWidth }}
           >
             <div className={clsx(shimmerClass, "mb-3 w-full")} style={{ height: cardHeight }} />
@@ -89,7 +96,7 @@ const Skeleton: React.FC<SkeletonProps> = ({
   if (type === "tabs") {
     const tabCount = typeof columns === "number" ? columns : 4;
     return (
-      <div className="flex gap-3 rounded-xl border border-gray-100 bg-white p-2 shadow-sm">
+      <div className="flex gap-3 rounded-xl border border-default bg-surface p-2 shadow-sm">
         {Array.from({ length: tabCount }, (_, index) => (
           <div key={index} className={clsx(shimmerClass, "h-8 w-24 rounded-full")} />
         ))}

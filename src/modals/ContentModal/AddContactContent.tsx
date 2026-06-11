@@ -1,7 +1,7 @@
 "use client";
 
 import React from "react";
-import CustomInput from "@/components/Common/inputField";
+import CustomInput from "@/components/shared/inputField";
 
 interface AddContactContentProps {
   setPhone: (value: string) => void;

@@ -9,6 +9,7 @@ interface IconProps {
   color?: string;
   className?: string;
   ariaLabel?: string;
+  strokeWidth?: number;
   onClick?: () => void;
 }
 
@@ -18,6 +19,7 @@ const Icon: React.FC<IconProps> = ({
   color,
   className,
   ariaLabel,
+  strokeWidth,
   onClick,
 }) => {
   const entry = iconMap[name];
@@ -52,6 +54,7 @@ const Icon: React.FC<IconProps> = ({
       color={color}
       className={className}
       aria-label={ariaLabel}
+      strokeWidth={strokeWidth}
       onClick={onClick}
     />
   );

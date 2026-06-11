@@ -1,15 +1,14 @@
 "use client";
 
+
 import { FormEvent, useEffect, useState } from "react";
 import axios from "axios";
 import api from "@/lib/api";
 import Icon from "@/components/ui/Icon";
 import { ToasterUtils } from "@/components/ui/toast";
-import { Button, Checkbox, CustomSelect } from "@/components/Common";
-import CustomInput from "@/components/Common/inputField";
-import { FiArrowDown, FiArrowUp, FiSave } from "react-icons/fi";
-import { SiShopify } from "react-icons/si";
-
+import { Button, Checkbox, CustomSelect } from "@/components/shared";
+import CustomInput from "@/components/shared/inputField";
+import Skeleton from "@/components/shared/Skeleton";
 type ConnectResponse = {
   status?: string;
   connection?: {
@@ -117,12 +116,14 @@ export default function ShopifyIntegrationForm() {
   );
   const [isSyncModalOpen, setIsSyncModalOpen] = useState(false);
   const [connections, setConnections] = useState<EcommerceConnection[]>([]);
+  const [isLoadingConnections, setIsLoadingConnections] = useState(true);
   const [selectedConnectionId, setSelectedConnectionId] = useState<number | null>(null);
   const [catalogItems, setCatalogItems] = useState<CatalogItem[]>([]);
   const [isLoadingCollections, setIsLoadingCollections] = useState(false);
   const [isSavingCollections, setIsSavingCollections] = useState(false);
 
   async function loadConnections() {
+    setIsLoadingConnections(true);
     try {
       const response = await api.get<EcommerceConnection[]>("/ecommerce/connections");
       const shopifyConnections = response.data.filter(
@@ -132,6 +133,8 @@ export default function ShopifyIntegrationForm() {
       setSelectedConnectionId((current) => current || shopifyConnections[0]?.id || null);
     } catch {
       setConnections([]);
+    } finally {
+      setIsLoadingConnections(false);
     }
   }
 
@@ -265,7 +268,7 @@ export default function ShopifyIntegrationForm() {
             disabled={isConnecting}
             loading={isConnecting}
             text={isConnecting ? "Connecting..." : "Connect Shopify"}
-            icon={SiShopify}
+            icon="si:shopify"
             color="primary"
             size="md"
           />
@@ -295,18 +298,24 @@ export default function ShopifyIntegrationForm() {
         ) : null}
       </div>
 
-      {!connections.length ? (
+      {isLoadingConnections ? (
+        <div className="mt-4">
+          <Skeleton type="text" rows={3} height={22} />
+        </div>
+      ) : null}
+
+      {!isLoadingConnections && !connections.length ? (
         <p className="mt-4 rounded-md border border-default bg-surface-strong px-4 py-3 text-sm text-muted">
           Connect Shopify first to choose catalog collections.
         </p>
       ) : null}
 
-      {connections.length ? (
+      {!isLoadingConnections && connections.length ? (
         <div className="mt-4 rounded-lg border border-default bg-surface">
           {isLoadingCollections ? (
-            <p className="px-4 py-8 text-center text-sm text-muted">
-              Loading collections...
-            </p>
+            <div className="p-4">
+              <Skeleton type="text" rows={5} height={22} />
+            </div>
           ) : null}
 
           {!isLoadingCollections && catalogItems.length === 0 ? (
@@ -344,7 +353,7 @@ export default function ShopifyIntegrationForm() {
                     className="flex h-8 w-8 items-center justify-center rounded-md border border-default bg-white text-foreground transition hover:bg-surface-strong disabled:opacity-40 dark:bg-slate-950"
                     aria-label={`Move ${item.title} up`}
                   >
-                    <FiArrowUp size={15} />
+                    <Icon name="fi:arrow-up" size={15} />
                   </button>
                   <button
                     type="button"
@@ -358,7 +367,7 @@ export default function ShopifyIntegrationForm() {
                     className="flex h-8 w-8 items-center justify-center rounded-md border border-default bg-white text-foreground transition hover:bg-surface-strong disabled:opacity-40 dark:bg-slate-950"
                     aria-label={`Move ${item.title} down`}
                   >
-                    <FiArrowDown size={15} />
+                    <Icon name="fi:arrow-down" size={15} />
                   </button>
                   <Checkbox
                     checked={item.visible}
@@ -385,7 +394,7 @@ export default function ShopifyIntegrationForm() {
                 disabled={isSavingCollections || !selectedConnectionId}
                 loading={isSavingCollections}
                 text={isSavingCollections ? "Saving..." : "Save Categories"}
-                icon={FiSave}
+                icon="fi:save"
                 color="primary"
                 size="md"
                 onClick={async () => {

@@ -1,7 +1,7 @@
 "use client";
 
+import Icon from "@/components/ui/Icon";
 import React, { ReactNode, useEffect, useRef, useState } from "react";
-import { FiChevronDown, FiX } from "react-icons/fi";
 
 interface Option {
   label: string;
@@ -77,9 +77,9 @@ const ButtonDropdown: React.FC<ButtonDropdownProps> = ({
       style={{ minWidth, maxWidth, width: "100%" }}
     >
       {label && (
-        <label className="mb-0.5 flex items-center gap-1 text-sm font-medium text-gray-800">
+        <label className="mb-0.5 flex items-center gap-1 text-sm font-medium text-foreground">
           <span>{label}</span>
-          {optional && <span className="ml-1 font-normal text-gray-400">Optional</span>}
+          {optional && <span className="ml-1 font-normal text-muted">Optional</span>}
         </label>
       )}
 
@@ -89,16 +89,16 @@ const ButtonDropdown: React.FC<ButtonDropdownProps> = ({
           disabled={disabled}
           onClick={() => setOpen((prev) => !prev)}
           className={`flex h-[45px] w-full items-center justify-between gap-2 rounded-[5px] border px-3 text-sm outline-none transition-all duration-300 ease-in-out ${
-            disabled ? "cursor-not-allowed bg-gray-100 opacity-60" : "cursor-pointer bg-white"
+            disabled ? "cursor-not-allowed bg-surface-strong opacity-60" : "cursor-pointer bg-white dark:bg-slate-950"
           } ${
             error
               ? "border-red-500 ring-[3px] ring-red-500/20"
               : open
                 ? "border-[#818cf8] ring-[3px] ring-[#818cf8]/30"
-                : "border-gray-300 hover:border-[#818cf8]"
+                : "border-default hover:border-[#818cf8]"
           }`}
         >
-          <span className="min-w-0 flex-1 truncate text-left text-[#0d0c22]">
+          <span className="min-w-0 flex-1 truncate text-left text-foreground">
             {buttonContent || selectedOption?.label || defaultLabel || buttonLabel}
           </span>
 
@@ -106,20 +106,20 @@ const ButtonDropdown: React.FC<ButtonDropdownProps> = ({
             {isClearable && selected && !disabled && (
               <span
                 onClick={handleClear}
-                className="rounded-full p-0.5 text-gray-400 transition-colors hover:bg-gray-100 hover:text-red-500"
+                className="rounded-full p-0.5 text-muted transition-colors hover:bg-surface-strong hover:text-red-500"
               >
-                <FiX size={18} />
+                <Icon name="fi:x" size={18} />
               </span>
             )}
-            <FiChevronDown
+            <Icon name="fi:chevron-down"
               size={20}
-              className={`text-[#64748b] transition-transform ${open ? "rotate-180" : ""}`}
+              className={`text-muted transition-transform ${open ? "rotate-180" : ""}`}
             />
           </div>
         </button>
 
         {open && !disabled && (
-          <div className="absolute left-0 right-0 z-[100] mt-1.5 overflow-hidden rounded-lg border border-gray-200 bg-white shadow-xl">
+          <div className="absolute left-0 right-0 z-[100] mt-1.5 overflow-hidden rounded-lg border border-default bg-white shadow-xl dark:bg-slate-950">
             <div className="max-h-[250px] overflow-y-auto py-1">
               {options.map((option) => (
                 <button
@@ -133,7 +133,7 @@ const ButtonDropdown: React.FC<ButtonDropdownProps> = ({
                   className={`w-full px-4 py-2.5 text-left text-sm transition-colors ${
                     option.value === selected
                       ? "bg-[#818cf8]/10 font-semibold text-[#818cf8]"
-                      : "text-gray-700 hover:bg-gray-50"
+                      : "text-foreground hover:bg-surface-hover"
                   }`}
                 >
                   {option.label}
@@ -145,7 +145,7 @@ const ButtonDropdown: React.FC<ButtonDropdownProps> = ({
       </div>
 
       {helperText && (
-        <p className={`mt-0.5 text-[12px] font-medium ${error ? "text-red-500" : "text-gray-500"}`}>
+        <p className={`mt-0.5 text-[12px] font-medium ${error ? "text-red-500" : "text-muted"}`}>
           {helperText}
         </p>
       )}

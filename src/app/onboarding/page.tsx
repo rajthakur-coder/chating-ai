@@ -1,22 +1,12 @@
 "use client";
 
+import Icon from "@/components/ui/Icon";
 import Link from "next/link";
-import { useState } from "react";
+import { useMemo, useState } from "react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import {
-  FiAlertTriangle,
-  FiArrowRight,
-  FiCheckCircle,
-  FiClock,
-  FiGlobe,
-  FiLock,
-  FiPlay,
-  FiRefreshCw,
-  FiTarget,
-  FiZap,
-} from "react-icons/fi";
 import { ToasterUtils } from "@/components/ui/toast";
 import { onboardingApi } from "@/services/backendModules";
+import Skeleton from "@/components/shared/Skeleton";
 
 type OnboardingStep = {
   key: string;
@@ -83,13 +73,13 @@ function StatCard({
   label,
   value,
   detail,
-  icon: Icon,
+  icon,
   tone,
 }: {
   label: string;
   value: string;
   detail: string;
-  icon: typeof FiTarget;
+  icon: string;
   tone: string;
 }) {
   return (
@@ -100,7 +90,7 @@ function StatCard({
           <p className="mt-2 text-2xl font-semibold text-foreground">{value}</p>
         </div>
         <span className={`flex h-10 w-10 items-center justify-center rounded-md ${tone}`}>
-          <Icon size={18} />
+          <Icon name={icon} size={18} />
         </span>
       </div>
       <p className="mt-3 text-xs text-muted">{detail}</p>
@@ -109,9 +99,9 @@ function StatCard({
 }
 
 function StepIcon({ step }: { step: OnboardingStep }) {
-  if (step.completed) return <FiCheckCircle size={18} />;
-  if (step.status === "blocked") return <FiLock size={18} />;
-  return <FiAlertTriangle size={18} />;
+  if (step.completed) return <Icon name="fi:check-circle" size={18} />;
+  if (step.status === "blocked") return <Icon name="fi:lock" size={18} />;
+  return <Icon name="fi:alert-triangle" size={18} />;
 }
 
 function StepCard({ step }: { step: OnboardingStep }) {
@@ -158,7 +148,7 @@ function StepCard({ step }: { step: OnboardingStep }) {
                 className="inline-flex items-center gap-2 rounded-md border border-default px-3 py-2 text-sm font-semibold text-foreground transition hover:bg-surface-strong"
               >
                 {label}
-                <FiArrowRight size={14} />
+                <Icon name="fi:arrow-right" size={14} />
               </Link>
             )}
           </div>
@@ -182,6 +172,7 @@ export default function OnboardingPage() {
     queryKey: ["onboarding-readiness"],
     queryFn: onboardingApi.readiness,
   });
+  const isInitialLoading = wizardQuery.isLoading || readinessQuery.isLoading;
 
   const wizard = (wizardQuery.data || {}) as OnboardingWizard;
   const readiness = (readinessQuery.data || {}) as Readiness;
@@ -242,7 +233,7 @@ export default function OnboardingPage() {
             onClick={refresh}
             className="inline-flex h-10 items-center justify-center gap-2 rounded-md border border-default px-4 text-sm font-semibold text-foreground transition hover:bg-surface-strong"
           >
-            <FiRefreshCw size={16} />
+            <Icon name="fi:refresh-cw" size={16} />
             Refresh
           </button>
           <button
@@ -250,43 +241,57 @@ export default function OnboardingPage() {
             disabled={goLive.isPending || !readiness.ready}
             className="inline-flex h-10 items-center justify-center gap-2 rounded-md bg-primary px-4 text-sm font-semibold text-white transition hover:bg-primary-strong disabled:cursor-not-allowed disabled:opacity-60"
           >
-            <FiPlay size={16} />
+            <Icon name="fi:play" size={16} />
             {goLive.isPending ? "Going live..." : "Go Live"}
           </button>
         </div>
       </section>
 
       <section className="grid gap-4 md:grid-cols-2 xl:grid-cols-4">
-        <StatCard
-          label="Launch progress"
-          value={`${percent}%`}
-          detail={`${completedCount}/${steps.length || 0} total steps complete`}
-          icon={FiTarget}
-          tone="bg-blue-50 text-blue-700 dark:bg-blue-950/50 dark:text-blue-200"
-        />
-        <StatCard
-          label="Required steps"
-          value={`${completedRequired}/${requiredSteps.length || 0}`}
-          detail={pendingRequired.length ? `${pendingRequired.length} required checks pending` : "Required checks are complete"}
-          icon={FiCheckCircle}
-          tone="bg-emerald-50 text-emerald-700 dark:bg-emerald-950/50 dark:text-emerald-200"
-        />
-        <StatCard
-          label="Blockers"
-          value={String(blockers.length)}
-          detail={blockers.length ? "Resolve before go-live" : "No readiness blockers found"}
-          icon={FiAlertTriangle}
-          tone={blockers.length ? "bg-amber-50 text-amber-700 dark:bg-amber-950/50 dark:text-amber-200" : "bg-emerald-50 text-emerald-700 dark:bg-emerald-950/50 dark:text-emerald-200"}
-        />
-        <StatCard
-          label="Time estimate"
-          value={`${estimatedMinutes} min`}
-          detail="Based on remaining onboarding work"
-          icon={FiClock}
-          tone="bg-violet-50 text-violet-700 dark:bg-violet-950/50 dark:text-violet-200"
-        />
+        {isInitialLoading ? (
+          <div className="md:col-span-2 xl:col-span-4">
+            <Skeleton type="card" rows={1} cardPerRow={4} cardHeight={76} />
+          </div>
+        ) : (
+          <>
+            <StatCard
+              label="Launch progress"
+              value={`${percent}%`}
+              detail={`${completedCount}/${steps.length || 0} total steps complete`}
+              icon="fi:target"
+              tone="bg-blue-50 text-blue-700 dark:bg-blue-950/50 dark:text-blue-200"
+            />
+            <StatCard
+              label="Required steps"
+              value={`${completedRequired}/${requiredSteps.length || 0}`}
+              detail={pendingRequired.length ? `${pendingRequired.length} required checks pending` : "Required checks are complete"}
+              icon="fi:check-circle"
+              tone="bg-emerald-50 text-emerald-700 dark:bg-emerald-950/50 dark:text-emerald-200"
+            />
+            <StatCard
+              label="Blockers"
+              value={String(blockers.length)}
+              detail={blockers.length ? "Resolve before go-live" : "No readiness blockers found"}
+              icon="fi:alert-triangle"
+              tone={blockers.length ? "bg-amber-50 text-amber-700 dark:bg-amber-950/50 dark:text-amber-200" : "bg-emerald-50 text-emerald-700 dark:bg-emerald-950/50 dark:text-emerald-200"}
+            />
+            <StatCard
+              label="Time estimate"
+              value={`${estimatedMinutes} min`}
+              detail="Based on remaining onboarding work"
+              icon="fi:clock"
+              tone="bg-violet-50 text-violet-700 dark:bg-violet-950/50 dark:text-violet-200"
+            />
+          </>
+        )}
       </section>
 
+      {isInitialLoading ? (
+        <section className="grid gap-4 lg:grid-cols-[1fr_380px]">
+          <Skeleton type="card" rows={1} cardPerRow={1} cardHeight={260} />
+          <Skeleton type="card" rows={1} cardPerRow={1} cardHeight={260} />
+        </section>
+      ) : (
       <section className="grid gap-4 lg:grid-cols-[1fr_380px]">
         <div className="rounded-lg border border-default bg-surface p-5">
           <div className="flex items-start justify-between gap-4">
@@ -323,7 +328,7 @@ export default function OnboardingPage() {
                 {pendingRequired.slice(0, 3).map((step) => (
                   <Link key={step.key} href={stepRoutes[step.key] || "/onboarding"} className="flex items-center justify-between rounded-md bg-surface-strong px-3 py-2 text-sm font-semibold text-foreground">
                     <span className="truncate">{step.title}</span>
-                    <FiArrowRight size={14} />
+                    <Icon name="fi:arrow-right" size={14} />
                   </Link>
                 ))}
                 {!pendingRequired.length ? (
@@ -360,17 +365,22 @@ export default function OnboardingPage() {
           </div>
         </div>
       </section>
+      )}
 
-      <section className="grid gap-4 md:grid-cols-2 xl:grid-cols-3">
-        {steps.map((step) => (
-          <StepCard key={step.key} step={step} />
-        ))}
-      </section>
+      {isInitialLoading ? (
+        <Skeleton type="card" rows={2} cardPerRow={3} cardHeight={150} />
+      ) : (
+        <section className="grid gap-4 md:grid-cols-2 xl:grid-cols-3">
+          {steps.map((step) => (
+            <StepCard key={step.key} step={step} />
+          ))}
+        </section>
+      )}
 
       <section className="grid gap-4 lg:grid-cols-2">
         <div className="rounded-lg border border-default bg-surface p-5">
           <h2 className="flex items-center gap-2 text-lg font-semibold text-foreground">
-            <FiZap size={18} />
+            <Icon name="fi:zap" size={18} />
             AI Brand Setup
           </h2>
           <p className="mt-1 text-sm text-muted">Import brand voice, policies, and FAQ context from your website.</p>
@@ -386,7 +396,7 @@ export default function OnboardingPage() {
               onClick={() => websiteAssist.mutate(websiteUrl.trim())}
               className="inline-flex h-10 items-center gap-2 rounded-md border border-default px-4 text-sm font-semibold text-foreground transition hover:bg-surface-strong disabled:cursor-not-allowed disabled:opacity-60"
             >
-              <FiGlobe size={15} />
+              <Icon name="fi:globe" size={15} />
               Apply
             </button>
           </div>
@@ -413,7 +423,7 @@ export default function OnboardingPage() {
               onClick={() => preview.mutate()}
               className="inline-flex h-10 w-fit items-center gap-2 rounded-md border border-default px-4 text-sm font-semibold text-foreground transition hover:bg-surface-strong disabled:cursor-not-allowed disabled:opacity-60"
             >
-              <FiRefreshCw size={15} />
+              <Icon name="fi:refresh-cw" size={15} />
               Run Preview
             </button>
           </div>
