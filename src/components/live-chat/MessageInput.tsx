@@ -1,7 +1,7 @@
 "use client";
 
 import Icon from "@/components/ui/Icon";
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { cn } from "@/lib/utils";
 import { SearchInput } from "@/components/shared";
 import CustomInput from "@/components/shared/inputField";
@@ -19,26 +19,34 @@ import { getTemplateBody, getTemplateVariableKeys } from "./utils";
 
 export default function MessageInput({
   selectedChat,
-  draftMessage,
-  setDraftMessage,
   onSend,
   isSending,
   onTemplateSent,
 }: {
   selectedChat: Chat;
-  draftMessage: string;
-  setDraftMessage: (value: string) => void;
-  onSend: () => void;
+  onSend: (message: string) => void;
   isSending: boolean;
   onTemplateSent: () => void;
 }) {
   const [popupOpen, setPopupOpen] = useState(false);
+  const [draftMessage, setDraftMessage] = useState("");
   const [templatePickerOpen, setTemplatePickerOpen] = useState(false);
   const [templateSearch, setTemplateSearch] = useState("");
   const debouncedTemplateSearch = useDebouncedValue(templateSearch.trim(), 300);
   const [selectedTemplate, setSelectedTemplate] = useState<WhatsappTemplate | null>(null);
   const [templateVariables, setTemplateVariables] = useState<Record<string, string>>({});
   const isWindowOpenLive = selectedChat.isWindowOpen;
+
+  useEffect(() => {
+    setDraftMessage("");
+  }, [selectedChat.id]);
+
+  const handleSendDraft = () => {
+    const text = draftMessage.trim();
+    if (!text || isSending) return;
+    onSend(text);
+    setDraftMessage("");
+  };
 
   const templatesQuery = useQuery({
     queryKey: ["live-chat-templates", debouncedTemplateSearch],
@@ -287,7 +295,7 @@ export default function MessageInput({
               onKeyDown={(event) => {
                 if (event.key === "Enter" && !event.shiftKey) {
                   event.preventDefault();
-                  onSend();
+                  handleSendDraft();
                 }
               }}
               className="min-w-0 flex-1 resize-none rounded-2xl border border-default bg-white px-4 py-2 text-sm text-foreground outline-none placeholder:text-muted focus:ring-2 focus:ring-teal-600 dark:bg-slate-900"
@@ -296,7 +304,7 @@ export default function MessageInput({
             <button
               type="button"
               aria-label="Voice message"
-              onClick={draftMessage ? onSend : undefined}
+              onClick={draftMessage ? handleSendDraft : undefined}
               disabled={isSending}
               className="flex h-10 w-10 items-center justify-center rounded-full text-white transition hover:opacity-80"
               style={{ backgroundColor: LIVE_CHAT_PRIMARY }}

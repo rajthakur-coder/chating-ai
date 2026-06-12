@@ -122,9 +122,7 @@ export default function LiveChatPage() {
   const {
     selectedChatId,
     filter,
-    draftMessage,
     setSelectedChatId,
-    setDraftMessage,
   } = useChatStore();
   const [search, setSearch] = useState("");
   const [searchOpen, setSearchOpen] = useState(false);
@@ -207,7 +205,6 @@ export default function LiveChatPage() {
   const sendMutation = useMutation({
     mutationFn: sendLiveChatMessage,
     onSuccess: () => {
-      setDraftMessage("");
       queryClient.invalidateQueries({ queryKey: ["live-chat-contacts"] });
       queryClient.invalidateQueries({
         queryKey: ["live-chat-messages", selectedChat?.id],
@@ -232,8 +229,8 @@ export default function LiveChatPage() {
     });
   };
 
-  const handleSendMessage = () => {
-    const text = draftMessage.trim();
+  const handleSendMessage = (message: string) => {
+    const text = message.trim();
     if (!selectedChat?.id || !text || sendMutation.isPending) return;
     sendMutation.mutate({
       to_no: selectedChat.id,
@@ -445,8 +442,6 @@ export default function LiveChatPage() {
               />
               <MessageInput
                 selectedChat={selectedChat}
-                draftMessage={draftMessage}
-                setDraftMessage={setDraftMessage}
                 onSend={handleSendMessage}
                 isSending={sendMutation.isPending}
                 onTemplateSent={refreshSelectedChat}
@@ -502,8 +497,6 @@ export default function LiveChatPage() {
             />
             <MessageInput
               selectedChat={selectedChat}
-              draftMessage={draftMessage}
-              setDraftMessage={setDraftMessage}
               onSend={handleSendMessage}
               isSending={sendMutation.isPending}
               onTemplateSent={refreshSelectedChat}

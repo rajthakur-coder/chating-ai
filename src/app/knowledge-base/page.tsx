@@ -18,6 +18,8 @@ const emptyKnowledge: KnowledgeBase = {
   website_link: "",
   company_name: "",
   industry: "",
+  contact_email: "",
+  contact_phone: "",
   about_company: "",
   target_demographics: "",
   logo: "",
@@ -189,6 +191,16 @@ export default function KnowledgeBasePage() {
                 label="Industry"
                 value={form.industry || ""}
                 onChange={(value) => updateField("industry", value)}
+              />
+              <CustomInput
+                label="Support email"
+                value={form.contact_email || ""}
+                onChange={(value) => updateField("contact_email", value)}
+              />
+              <CustomInput
+                label="Support mobile"
+                value={form.contact_phone || ""}
+                onChange={(value) => updateField("contact_phone", value)}
               />
             </div>
             <CustomInput

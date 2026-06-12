@@ -2,7 +2,7 @@ import api from "@/lib/api";
 import axios from "axios";
 import type { HandoffTicket } from "@/types/handoffs";
 
-export type { HandoffStatus, HandoffTicket } from "@/types/handoffs";
+export type { HandoffMessage, HandoffStatus, HandoffTicket } from "@/types/handoffs";
 
 export async function getHandoffs(status?: string) {
   const response = await api.get<HandoffTicket[]>("/handoffs", {

@@ -8,6 +8,8 @@ export type KnowledgeBase = {
   website_link?: string | null;
   company_name?: string | null;
   industry?: string | null;
+  contact_email?: string | null;
+  contact_phone?: string | null;
   about_company?: string | null;
   target_demographics?: string | null;
   logo?: string | null;
