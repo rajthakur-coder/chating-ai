@@ -125,7 +125,13 @@ export function interactiveReplyPreview(
     "view catalog",
     "track order",
     "talk to human",
-  ].includes(normalizedReply) || /^catalog (dynamic )?category\s+/i.test(rawText) || /^catalog page\s+\d+$/i.test(rawText);
+    "return",
+    "returns",
+    "exchange",
+    "return / exchange",
+    "return/exchange",
+    "return & exchange",
+  ].includes(normalizedReply) || /^return:/i.test(rawText) || /^confirm:return:/i.test(rawText) || /^catalog (dynamic )?category\s+/i.test(rawText) || /^catalog page\s+\d+$/i.test(rawText);
 
   if (explicitReply?.reply_message_body) {
     return {

@@ -398,6 +398,86 @@ function QueueSkeleton() {
   );
 }
 
+function PageSkeleton() {
+  return (
+    <div className="mx-auto flex max-w-7xl animate-pulse flex-col gap-6">
+      <div className="grid gap-5 xl:grid-cols-[minmax(0,1fr)_360px]">
+        <section className="rounded-2xl border border-default bg-white p-8 shadow-default dark:bg-slate-950">
+          <div className="h-6 w-48 rounded-full bg-slate-100" />
+          <div className="mt-6 h-12 w-72 rounded bg-slate-200" />
+          <div className="mt-5 space-y-3">
+            <div className="h-4 w-full max-w-3xl rounded bg-slate-100" />
+            <div className="h-4 w-2/3 rounded bg-slate-100" />
+          </div>
+          <div className="mt-7 grid gap-4 md:grid-cols-3">
+            {[0, 1, 2].map((item) => (
+              <div key={item} className="rounded-xl border border-default bg-background px-4 py-3">
+                <div className="h-3 w-28 rounded bg-slate-100" />
+                <div className="mt-3 h-4 w-36 rounded bg-slate-200" />
+              </div>
+            ))}
+          </div>
+        </section>
+
+        <section className="rounded-2xl bg-[#17134a] p-7 shadow-default">
+          <div className="flex items-start justify-between gap-4">
+            <div className="h-3 w-36 rounded bg-white/20" />
+            <div className="h-9 w-9 rounded-full bg-white/10" />
+          </div>
+          <div className="mt-8 h-8 w-36 rounded bg-white/20" />
+          <div className="mt-4 h-4 w-44 rounded bg-white/20" />
+          <div className="mt-3 space-y-2">
+            <div className="h-3 w-full rounded bg-white/10" />
+            <div className="h-3 w-4/5 rounded bg-white/10" />
+          </div>
+          <div className="mt-7 h-11 rounded-full bg-white/20" />
+        </section>
+      </div>
+
+      <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-4">
+        {[0, 1, 2, 3].map((item) => (
+          <section key={item} className="rounded-2xl border border-default bg-white p-6 shadow-default dark:bg-slate-950">
+            <div className="flex items-start justify-between gap-4">
+              <div className="h-3 w-32 rounded bg-slate-100" />
+              <div className="h-8 w-8 rounded-full bg-slate-100" />
+            </div>
+            <div className="mt-5 h-9 w-12 rounded bg-slate-200" />
+            <div className="mt-5 h-3 w-full rounded bg-slate-100" />
+          </section>
+        ))}
+      </div>
+
+      <section className="overflow-hidden rounded-2xl border border-default bg-white shadow-default dark:bg-slate-950">
+        <div className="flex flex-col gap-4 border-b border-default px-6 py-6 lg:flex-row lg:items-center lg:justify-between">
+          <div>
+            <div className="h-5 w-32 rounded bg-slate-200" />
+            <div className="mt-2 h-4 w-80 rounded bg-slate-100" />
+          </div>
+          <div className="flex flex-col gap-3 sm:flex-row sm:items-center">
+            <div className="h-10 w-full rounded-full bg-slate-100 sm:w-[280px]" />
+            <div className="h-10 w-24 rounded-full bg-slate-100" />
+          </div>
+        </div>
+        <div className="flex border-b border-default px-6">
+          {[0, 1, 2, 3].map((item) => (
+            <div key={item} className="px-5 py-3">
+              <div className="h-4 w-16 rounded bg-slate-100" />
+            </div>
+          ))}
+        </div>
+        <div className="hidden grid-cols-[1.1fr_1.7fr_280px] border-b border-default bg-surface px-6 py-3 lg:grid">
+          <div className="h-3 w-24 rounded bg-slate-100" />
+          <div className="h-3 w-40 rounded bg-slate-100" />
+          <div className="ml-auto h-3 w-24 rounded bg-slate-100" />
+        </div>
+        <QueueSkeleton />
+        <QueueSkeleton />
+        <QueueSkeleton />
+      </section>
+    </div>
+  );
+}
+
 function MetricCard({
   label,
   value,
@@ -627,6 +707,10 @@ export default function SupportTicketsPage() {
       temp_msg_id: `handoff-${ticket.id}-${Date.now()}`,
     });
   };
+
+  if (ticketsQuery.isLoading) {
+    return <PageSkeleton />;
+  }
 
   if (selectedTicket) {
     const messages = ticketMessages(selectedTicket);
